@@ -19,48 +19,48 @@ someArray.push("igor");
 let newArray = [...someArray];
 console.log(newArray);
 const creatingWatch = () => {
-  let inputForNameOfWatch = document.getElementById("watch-brand");
-  let inputForModelOfWatch = document.getElementById("watch-model");
-  let inputForAgeOfWatch = document.getElementById("watch-age");
-  let inputForDescOfWatch = document.getElementById("desc-of-watch");
+  // let inputForNameOfWatch = document.getElementById("watch-brand");
+  // let inputForModelOfWatch = document.getElementById("watch-model");
+  // let inputForAgeOfWatch = document.getElementById("watch-age");
+  // let inputForDescOfWatch = document.getElementById("desc-of-watch");
 
-  let column = document.createElement("div");
-  column.classList.add("col", "mt-5");
-  let cardForWatch = document.createElement("div");
-  cardForWatch.classList.add("card", "w-100");
-  let imgOfWatch = document.createElement("img");
-  imgOfWatch.classList.add("card-img-top");
-  let descriptionOfWatch = document.createElement("div");
-  descriptionOfWatch.classList.add("card-body");
-  let nameOfWatch = document.createElement("h5");
-  nameOfWatch.classList.add("card-title");
-  nameOfWatch.setAttribute("id", "nameOfWatch");
-  let ageOfWatch = document.createElement("h5");
-  ageOfWatch.classList.add("card-title", "agedWatch");
+  // let column = document.createElement("div");
+  // column.classList.add("col", "mt-5");
+  // let cardForWatch = document.createElement("div");
+  // cardForWatch.classList.add("card", "w-100");
+  // let imgOfWatch = document.createElement("img");
+  // imgOfWatch.classList.add("card-img-top");
+  // let descriptionOfWatch = document.createElement("div");
+  // descriptionOfWatch.classList.add("card-body");
+  // let nameOfWatch = document.createElement("h5");
+  // nameOfWatch.classList.add("card-title");
+  // nameOfWatch.setAttribute("id", "nameOfWatch");
+  // let ageOfWatch = document.createElement("h5");
+  // ageOfWatch.classList.add("card-title", "agedWatch");
 
-  ageOfWatch.innerHTML += "Година на производство " + inputForAgeOfWatch.value;
-  imgOfWatch.style.height = "300px";
-  // imgOfWatch.src = selectionResult;
-  nameOfWatch.innerHTML +=
-    inputForNameOfWatch.value + " " + inputForModelOfWatch.value;
-  let shortDescWatch = document.createElement("p");
-  shortDescWatch.classList.add("card-text");
-  shortDescWatch.innerHTML += inputForDescOfWatch.value;
-  let routeToWatch = document.createElement("a");
-  routeToWatch.innerHTML = "Види го огласот";
-  routeToWatch.href = "./item.html";
-  routeToWatch.classList.add("btn", "btn-primary");
-  descriptionOfWatch.append(
-    nameOfWatch,
-    ageOfWatch,
-    shortDescWatch,
-    routeToWatch
-  );
-  cardForWatch.appendChild(imgOfWatch);
-  cardForWatch.appendChild(descriptionOfWatch);
-  column.appendChild(cardForWatch);
-  theContainer.appendChild(column);
-  return column;
+  // ageOfWatch.innerHTML += "Година на производство " + inputForAgeOfWatch.value;
+  // imgOfWatch.style.height = "300px";
+  // // imgOfWatch.src = selectionResult;
+  // nameOfWatch.innerHTML +=
+  //   inputForNameOfWatch.value + " " + inputForModelOfWatch.value;
+  // let shortDescWatch = document.createElement("p");
+  // shortDescWatch.classList.add("card-text");
+  // shortDescWatch.innerHTML += inputForDescOfWatch.value;
+  // let routeToWatch = document.createElement("a");
+  // routeToWatch.innerHTML = "Види го огласот";
+  // routeToWatch.href = "./item.html";
+  // routeToWatch.classList.add("btn", "btn-primary");
+  // descriptionOfWatch.append(
+  //   nameOfWatch,
+  //   ageOfWatch,
+  //   shortDescWatch,
+  //   routeToWatch
+  // );
+  // cardForWatch.appendChild(imgOfWatch);
+  // cardForWatch.appendChild(descriptionOfWatch);
+  // column.appendChild(cardForWatch);
+  // theContainer.appendChild(column);
+  // return column;
 };
 addWatch.addEventListener("click", () => {
   // theContainer.appendChild(creatingWatch());

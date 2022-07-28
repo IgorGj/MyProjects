@@ -56,6 +56,8 @@ import {
   ref,
   get,
   set,
+  onChildAdded,
+  push,
   child,
   update,
   remove,
@@ -76,18 +78,34 @@ const app = initializeApp(firebaseConfig);
 
 const db = getDatabase();
 const dbRef = ref(db);
-
 const nameOfWatch = document.getElementById("watch-brand");
 const watchModel = document.getElementById("watch-model");
 const watchAge = document.getElementById("watch-age");
 const shortDescWatch = document.getElementById("desc-of-watch");
 
-const mark = document.getElementById("mark");
-const model = document.getElementById("model");
-const year = document.getElementById("year");
-const describe = document.getElementById("describe");
-const watch = document.getElementById("watch");
+// const mark = document.getElementById("mark");
+// const model = document.getElementById("model");
+// const year = document.getElementById("year");
+// const describe = document.getElementById("describe");
+// const watch = document.getElementById("watch");
+let firebaseRef = ref(db, "TheWatch/");
+console.log(dbRef);
 const InsertData = () => {
+  // const newWatches = push(dbRef);
+  // newWatches
+  //   .set({
+  //     watchModel: watchModel.value,
+  //     watchAge: watchAge.value,
+  //     shortDesc: shortDescWatch.value,
+  //   })
+  //   .then(() => {
+  //     console.log("success upload data");
+  //   })
+  //   .catch((error) => {
+  //     alert("unsuc,error", error);
+  //   });
+  // console.log(newWatches);
+
   set(ref(db, "TheWatch/" + nameOfWatch.value), {
     watchModel: watchModel.value,
     watchAge: watchAge.value,
@@ -102,71 +120,105 @@ const InsertData = () => {
 };
 let theContainer = document.querySelector("#important-row");
 
-let firebaseRef = ref(db, "/TheWatch/");
-console.log(firebaseRef);
-onValue(firebaseRef, (snapshot) => {
-  console.log(snapshot);
-  snapshot.forEach((childSnapshot) => {
-    let theCard = document.createElement("div");
-    theCard.classList.add("col", "mt-5");
-    let thecardForWatch = document.createElement("div");
-    thecardForWatch.classList.add("card", "w-100");
-    let theimgOfWatch = document.createElement("img");
-    theimgOfWatch.classList.add("card-img-top");
-    let thedescriptionOfWatch = document.createElement("div");
-    thedescriptionOfWatch.classList.add("card-body");
-    let thenameOfWatch = document.createElement("h5");
-    thenameOfWatch.classList.add("card-title");
-    thenameOfWatch.setAttribute("id", "nameOfWatch");
-    let theageOfWatch = document.createElement("h5");
-    let theshortDescWatch = document.createElement("p");
+// console.log(firebaseRef);
+onChildAdded(firebaseRef, (snapshot) => {
+  console.log("joj", snapshot);
+  let theCard = document.createElement("div");
+  theCard.classList.add("col", "mt-5");
+  let thecardForWatch = document.createElement("div");
+  thecardForWatch.classList.add("card", "w-100");
+  let theimgOfWatch = document.createElement("img");
+  theimgOfWatch.classList.add("card-img-top");
+  let thedescriptionOfWatch = document.createElement("div");
+  thedescriptionOfWatch.classList.add("card-body");
+  let thenameOfWatch = document.createElement("h5");
+  thenameOfWatch.classList.add("card-title");
+  thenameOfWatch.setAttribute("id", "nameOfWatch");
+  let theageOfWatch = document.createElement("h5");
+  let theshortDescWatch = document.createElement("p");
 
-    theageOfWatch.classList.add("card-title", "agedWatch");
-    thedescriptionOfWatch.append(
-      thenameOfWatch,
-      theageOfWatch,
-      theshortDescWatch
-    );
-    thecardForWatch.appendChild(theimgOfWatch);
-    thecardForWatch.appendChild(thedescriptionOfWatch);
-    theCard.appendChild(thecardForWatch);
-    theContainer.appendChild(theCard);
+  theageOfWatch.classList.add("card-title", "agedWatch");
+  thedescriptionOfWatch.append(
+    thenameOfWatch,
+    theageOfWatch,
+    theshortDescWatch
+  );
+  thecardForWatch.appendChild(theimgOfWatch);
+  thecardForWatch.appendChild(thedescriptionOfWatch);
+  theCard.appendChild(thecardForWatch);
+  theContainer.appendChild(theCard);
 
-    const data = childSnapshot.val();
-    const childKey = childSnapshot.key;
-    console.log(childKey);
-    const modelOfWatch = childSnapshot.val().watchModel;
-    const ageOfWatch = childSnapshot.val().watchAge;
-    const descWatch = childSnapshot.val().shortDesc;
+  const data = snapshot.val();
+  const childKey = snapshot.key;
+  console.log(childKey);
+  const modelOfWatch = snapshot.val().watchModel;
+  const ageOfWatch = snapshot.val().watchAge;
+  const descWatch = snapshot.val().shortDesc;
 
-    thenameOfWatch.innerHTML =childKey + " " + modelOfWatch;
-    theageOfWatch.innerHTML += "Година на производство " + ageOfWatch;
-    theshortDescWatch.innerHTML += descWatch;
-    // const someParag = document.createElement("p");
-    // someParag.innerHTML = modelOfWatch;
-    // document.body.append(someParag);
-    // childSnapshot.forEach((snapshot) => {
-    //   const arr = snapshot.val();
-    //   console.log(arr);
-    // });
-    // ...
-  });
-  // const data = snapshot.val();
-  // const newArr = Object.entries(data);
-  // console.log(newArr);
-
-  // model.innerHTML = newArr[0][0];
-  // for (const [key, value] of Object.entries(data)) {
-  //   // console.log(`${key}: ${Object.entries(value)}`);
-
-  //   const arr = Object.entries(value);
-  //   const arr2 = Array.from(arr);
-  //   console.log(arr2[0]);
-
-  //   console.log(arr);
-  //   return key, value;
-  // }
+  thenameOfWatch.innerHTML = childKey + " " + modelOfWatch;
+  theageOfWatch.innerHTML += "Година на производство " + ageOfWatch;
+  theshortDescWatch.innerHTML += descWatch;
 });
+// onValue(firebaseRef, (snapshot) => {
+//   console.log(snapshot);
+//   snapshot.forEach((childSnapshot) => {
+//     // let theCard = document.createElement("div");
+//     // theCard.classList.add("col", "mt-5");
+//     // let thecardForWatch = document.createElement("div");
+//     // thecardForWatch.classList.add("card", "w-100");
+//     // let theimgOfWatch = document.createElement("img");
+//     // theimgOfWatch.classList.add("card-img-top");
+//     // let thedescriptionOfWatch = document.createElement("div");
+//     // thedescriptionOfWatch.classList.add("card-body");
+//     // let thenameOfWatch = document.createElement("h5");
+//     // thenameOfWatch.classList.add("card-title");
+//     // thenameOfWatch.setAttribute("id", "nameOfWatch");
+//     // let theageOfWatch = document.createElement("h5");
+//     // let theshortDescWatch = document.createElement("p");
+//     // theageOfWatch.classList.add("card-title", "agedWatch");
+//     // thedescriptionOfWatch.append(
+//     //   thenameOfWatch,
+//     //   theageOfWatch,
+//     //   theshortDescWatch
+//     // );
+//     // thecardForWatch.appendChild(theimgOfWatch);
+//     // thecardForWatch.appendChild(thedescriptionOfWatch);
+//     // theCard.appendChild(thecardForWatch);
+//     // theContainer.appendChild(theCard);
+//     // const data = childSnapshot.val();
+//     // const childKey = childSnapshot.key;
+//     // console.log(childKey);
+//     // const modelOfWatch = childSnapshot.val().watchModel;
+//     // const ageOfWatch = childSnapshot.val().watchAge;
+//     // const descWatch = childSnapshot.val().shortDesc;
+//     // thenameOfWatch.innerHTML = childKey + " " + modelOfWatch;
+//     // theageOfWatch.innerHTML += "Година на производство " + ageOfWatch;
+//     // theshortDescWatch.innerHTML += descWatch;
+//     // const someParag = document.createElement("p");
+//     // someParag.innerHTML = modelOfWatch;
+//     // document.body.append(someParag);
+//     // childSnapshot.forEach((snapshot) => {
+//     //   const arr = snapshot.val();
+//     //   console.log(arr);
+//     // });
+//     // ...
+//   });
+//   // const data = snapshot.val();
+//   // const newArr = Object.entries(data);
+//   // console.log(newArr);
+
+//   // model.innerHTML = newArr[0][0];
+//   // for (const [key, value] of Object.entries(data)) {
+//   //   // console.log(`${key}: ${Object.entries(value)}`);
+
+//   //   const arr = Object.entries(value);
+//   //   const arr2 = Array.from(arr);
+//   //   console.log(arr2[0]);
+
+//   //   console.log(arr);
+//   //   return key, value;
+//   // }
+// });
 
 // const getData = () => {
 //   get(child(dbRef, "TheWatch/" + nameOfWatch.value))
