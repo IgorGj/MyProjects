@@ -1,72 +1,32 @@
-// import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.1/firebase-app.js";
-
-// import {
-//   getDatabase,
-//   ref,
-//   set,
-//   child,
-//   update,
-//   remove,
-// } from "https://www.gstatic.com/firebasejs/9.9.1/firebase-database.js";
-
-// window.addEventListener("load", () => {
-//   const db = getDatabase();
-
-//   const dbRef = ref(db);
-
-//   get(child(dbRef, "TheWatch/" + watchModel.value))
-//     .getHeaderNames((snapshot) => {
-//       if (snapshot.exists()) {
-//         watchAge.value = snapshot.val().watchAge;
-//         shortDescWatch.value = snapshot.val().shortDesc;
-
-//         //         watchModel: watchModel.value,
-//         // watchAge: watchAge.value,
-//         // shortDesc: shortDescWatch.value,
-//       } else {
-//         alert("no data found");
-//       }
-//     })
-//     .catch((error) => {
-//       alert("eror", error);
-//     });
-//   // const mark = document.getElementById("mark");
-//   // const model = document.getElementById("model");
-//   // const year = document.getElementById("year");
-//   // const describe = document.getElementById("describe");
-//   // const watch = document.getElementById("watch");
-
-//   // const description = localStorage.getItem("somePara");
-//   // const images = localStorage.getItem("someImg");
-//   // const header = localStorage.getItem("someHeader");
-//   // const oldWatch = localStorage.getItem("agedWatch");
-
-//   // mark.innerHTML += header;
-//   // describe.innerHTML += description;
-//   // watch.src = images;
-//   // year.innerHTML += oldWatch;
-// });
-
-// const getData = () => {};
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.1/firebase-app.js"; // TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-app.js";
 import {
-  getDatabase,
-  ref,
-  get,
-  set,
-  onChildAdded,
-  push,
-  child,
-  update,
-  remove,
-  onValue,
-} from "https://www.gstatic.com/firebasejs/9.9.1/firebase-database.js";
+  addDoc,
+  getDocs,
+  getDoc,
+  setDoc,
+} from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  query,
+  doc,
+  onSnapshot,
+} from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
+import {
+  getStorage,
+  ref as sRef,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/9.9.2/firebase-storage.js";
 
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAmsKYsU_0LQkC2KGFxRvzNV9dcmkWiqP0",
   authDomain: "watchsalesite-f6af0.firebaseapp.com",
+  databaseURL: "https://watchsalesite-f6af0-default-rtdb.firebaseio.com",
   projectId: "watchsalesite-f6af0",
   storageBucket: "watchsalesite-f6af0.appspot.com",
   messagingSenderId: "21745374690",
@@ -75,182 +35,139 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const imgOfWatch = document.getElementById("img-of-watch");
 
-const db = getDatabase();
-const dbRef = ref(db);
-const nameOfWatch = document.getElementById("watch-brand");
-const watchModel = document.getElementById("watch-model");
-const watchAge = document.getElementById("watch-age");
-const shortDescWatch = document.getElementById("desc-of-watch");
+let files = [];
+let reader = new FileReader();
 
-// const mark = document.getElementById("mark");
-// const model = document.getElementById("model");
-// const year = document.getElementById("year");
-// const describe = document.getElementById("describe");
-// const watch = document.getElementById("watch");
-let firebaseRef = ref(db, "TheWatch/");
-console.log(dbRef);
-const InsertData = () => {
-  // const newWatches = push(dbRef);
-  // newWatches
-  //   .set({
-  //     watchModel: watchModel.value,
-  //     watchAge: watchAge.value,
-  //     shortDesc: shortDescWatch.value,
-  //   })
-  //   .then(() => {
-  //     console.log("success upload data");
-  //   })
-  //   .catch((error) => {
-  //     alert("unsuc,error", error);
-  //   });
-  // console.log(newWatches);
+imgOfWatch.onchange = (e) => {
+  files = e.target.files;
 
-  set(ref(db, "TheWatch/" + nameOfWatch.value), {
-    watchModel: watchModel.value,
-    watchAge: watchAge.value,
-    shortDesc: shortDescWatch.value,
-  })
-    .then(() => {
-      console.log("success upload data");
-    })
-    .catch((error) => {
-      alert("unsuc,error", error);
-    });
+  // let extention = GetFileExt(files[0]);
+  // let theName = GetFileName(files[0]);
+
+  reader.readAsDataURL(files[0]);
 };
+
+// function GetFileExt(file) {
+//   let temp = file.name.split(".");
+//   let ext = temp.slice(temp.length - 1, temp.length);
+//   return "." + ext[0];
+// }
+
+// function GetFileName(file) {
+//   let temp = file.name.split(".");
+//   let fname = temp.slice(0, -1).join(".");
+//   return fname;
+// }
+
+// Add a new document in collection "wathes"
+const addingWatches = document.getElementById("add-watch");
+addingWatches.addEventListener("click", uploadProcess);
+
+async function uploadProcess() {
+  let imgtoUpload = files[0];
+  let imgName = new Date();
+  // set metadata so if the user doesn't chose an image he can't make a listing.
+  const metaData = {
+    contentType: imgtoUpload.type,
+  };
+
+  const storage = getStorage();
+  const storageRef = sRef(storage, "images/" + imgName);
+  const uploadTask = uploadBytesResumable(storageRef, imgtoUpload, metaData);
+  uploadTask.on(
+    "state-changed",
+    (snapshot) => {
+      let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log(progress);
+    },
+    (error) => {
+      alert("not uploaded");
+    },
+    function downURL() {
+      getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+        saveURLtoFirestore(downloadURL);
+      });
+    }
+  );
+}
+
+async function saveURLtoFirestore(url) {
+  let imgName = new Date();
+  const watchBrand = document.getElementById("watch-brand");
+  const watchModel = document.getElementById("watch-model");
+  const watchProdYear = document.getElementById("watch-age");
+  const descOfWatch = document.getElementById("desc-of-watch");
+
+  await addDoc(collection(db, "watches"), {
+    imageName: imgName,
+    imgUrl: url,
+    brand: watchBrand.value,
+    model: watchModel.value,
+    prodYear: watchProdYear.value,
+    description: descOfWatch.value,
+  });
+  watchBrand.value = "";
+  watchModel.value = "";
+  watchProdYear.value = "";
+  descOfWatch.value = "";
+  // url = "";
+}
+
+// const querySnapshot = await getDocs(collection(db, "watches"));
 let theContainer = document.querySelector("#important-row");
 
-// console.log(firebaseRef);
-onChildAdded(firebaseRef, (snapshot) => {
-  console.log("joj", snapshot);
-  let theCard = document.createElement("div");
-  theCard.classList.add("col", "mt-5");
-  let thecardForWatch = document.createElement("div");
-  thecardForWatch.classList.add("card", "w-100");
-  let theimgOfWatch = document.createElement("img");
-  theimgOfWatch.classList.add("card-img-top");
-  let thedescriptionOfWatch = document.createElement("div");
-  thedescriptionOfWatch.classList.add("card-body");
-  let thenameOfWatch = document.createElement("h5");
-  thenameOfWatch.classList.add("card-title");
-  thenameOfWatch.setAttribute("id", "nameOfWatch");
-  let theageOfWatch = document.createElement("h5");
-  let theshortDescWatch = document.createElement("p");
-
-  theageOfWatch.classList.add("card-title", "agedWatch");
-  thedescriptionOfWatch.append(
-    thenameOfWatch,
-    theageOfWatch,
-    theshortDescWatch
-  );
-  thecardForWatch.appendChild(theimgOfWatch);
-  thecardForWatch.appendChild(thedescriptionOfWatch);
-  theCard.appendChild(thecardForWatch);
-  theContainer.appendChild(theCard);
-
-  const data = snapshot.val();
-  const childKey = snapshot.key;
-  console.log(childKey);
-  const modelOfWatch = snapshot.val().watchModel;
-  const ageOfWatch = snapshot.val().watchAge;
-  const descWatch = snapshot.val().shortDesc;
-
-  thenameOfWatch.innerHTML = childKey + " " + modelOfWatch;
-  theageOfWatch.innerHTML += "Година на производство " + ageOfWatch;
-  theshortDescWatch.innerHTML += descWatch;
+const theCollection = query(collection(db, "watches"));
+const makingTheListing = onSnapshot(theCollection, (snapshot) => {
+  snapshot.docChanges().forEach((change) => {
+    if (change.type === "added") {
+      let theCard = document.createElement("div");
+      theCard.setAttribute("style", "cursor:pointer");
+      theCard.classList.add("col", "mt-5");
+      let thecardForWatch = document.createElement("div");
+      thecardForWatch.classList.add("card", "w-100");
+      let theimgOfWatch = document.createElement("img");
+      theimgOfWatch.classList.add("card-img-top");
+      let thedescriptionOfWatch = document.createElement("div");
+      thedescriptionOfWatch.classList.add("card-body");
+      let thenameOfWatch = document.createElement("h5");
+      thenameOfWatch.classList.add("card-title");
+      thenameOfWatch.setAttribute("id", "nameOfWatch");
+      let theageOfWatch = document.createElement("h5");
+      let theshortDescWatch = document.createElement("p");
+      theshortDescWatch.classList.add("card-text");
+      theageOfWatch.classList.add("card-title", "agedWatch");
+      thedescriptionOfWatch.append(
+        thenameOfWatch,
+        theageOfWatch,
+        theshortDescWatch
+      );
+      thecardForWatch.appendChild(theimgOfWatch);
+      thecardForWatch.appendChild(thedescriptionOfWatch);
+      theCard.appendChild(thecardForWatch);
+      theContainer.appendChild(theCard);
+      const modelOfWatch =
+        change.doc.data().brand + " " + change.doc.data().model;
+      let ageOfWatch = change.doc.data().prodYear;
+      const descWatch = change.doc.data().description;
+      const srcOfImg = change.doc.data().imgUrl;
+      theshortDescWatch.textContent = descWatch;
+      theimgOfWatch.src = srcOfImg;
+      thenameOfWatch.innerHTML = modelOfWatch;
+      if (ageOfWatch === "") {
+        ageOfWatch = "Не се знае!";
+      }
+      theageOfWatch.innerHTML = "Година на производство: " + ageOfWatch;
+      console.log(ageOfWatch);
+      theBestFunc();
+    }
+    if (change.type === "modified") {
+      console.log("Modified city: ", change.doc.data());
+    }
+    if (change.type === "removed") {
+      console.log("Removed city: ", change.doc.data());
+    }
+  });
 });
-// onValue(firebaseRef, (snapshot) => {
-//   console.log(snapshot);
-//   snapshot.forEach((childSnapshot) => {
-//     // let theCard = document.createElement("div");
-//     // theCard.classList.add("col", "mt-5");
-//     // let thecardForWatch = document.createElement("div");
-//     // thecardForWatch.classList.add("card", "w-100");
-//     // let theimgOfWatch = document.createElement("img");
-//     // theimgOfWatch.classList.add("card-img-top");
-//     // let thedescriptionOfWatch = document.createElement("div");
-//     // thedescriptionOfWatch.classList.add("card-body");
-//     // let thenameOfWatch = document.createElement("h5");
-//     // thenameOfWatch.classList.add("card-title");
-//     // thenameOfWatch.setAttribute("id", "nameOfWatch");
-//     // let theageOfWatch = document.createElement("h5");
-//     // let theshortDescWatch = document.createElement("p");
-//     // theageOfWatch.classList.add("card-title", "agedWatch");
-//     // thedescriptionOfWatch.append(
-//     //   thenameOfWatch,
-//     //   theageOfWatch,
-//     //   theshortDescWatch
-//     // );
-//     // thecardForWatch.appendChild(theimgOfWatch);
-//     // thecardForWatch.appendChild(thedescriptionOfWatch);
-//     // theCard.appendChild(thecardForWatch);
-//     // theContainer.appendChild(theCard);
-//     // const data = childSnapshot.val();
-//     // const childKey = childSnapshot.key;
-//     // console.log(childKey);
-//     // const modelOfWatch = childSnapshot.val().watchModel;
-//     // const ageOfWatch = childSnapshot.val().watchAge;
-//     // const descWatch = childSnapshot.val().shortDesc;
-//     // thenameOfWatch.innerHTML = childKey + " " + modelOfWatch;
-//     // theageOfWatch.innerHTML += "Година на производство " + ageOfWatch;
-//     // theshortDescWatch.innerHTML += descWatch;
-//     // const someParag = document.createElement("p");
-//     // someParag.innerHTML = modelOfWatch;
-//     // document.body.append(someParag);
-//     // childSnapshot.forEach((snapshot) => {
-//     //   const arr = snapshot.val();
-//     //   console.log(arr);
-//     // });
-//     // ...
-//   });
-//   // const data = snapshot.val();
-//   // const newArr = Object.entries(data);
-//   // console.log(newArr);
-
-//   // model.innerHTML = newArr[0][0];
-//   // for (const [key, value] of Object.entries(data)) {
-//   //   // console.log(`${key}: ${Object.entries(value)}`);
-
-//   //   const arr = Object.entries(value);
-//   //   const arr2 = Array.from(arr);
-//   //   console.log(arr2[0]);
-
-//   //   console.log(arr);
-//   //   return key, value;
-//   // }
-// });
-
-// const getData = () => {
-//   get(child(dbRef, "TheWatch/" + nameOfWatch.value))
-//     .then((snapshot) => {
-//       if (snapshot.exists()) {
-//         watchModel.value = snapshot.val().watchModel;
-//         watchAge.value = snapshot.val().watchAge;
-//         shortDescWatch.value = snapshot.val().shortDesc;
-//         console.log("joj");
-//         //         watchModel: watchModel.value,
-//         // watchAge: watchAge.value,
-//         // shortDesc: shortDescWatch.value,
-//       } else {
-//         alert("no data found");
-//       }
-//     })
-//     .catch((error) => {
-//       alert("eror", error);
-//     });
-//   const mark = document.getElementById("mark");
-//   const model = document.getElementById("model");
-//   const year = document.getElementById("year");
-//   const describe = document.getElementById("describe");
-//   const watch = document.getElementById("watch");
-//   mark.innerHTML = "joj";
-//   console.log("joj");
-// };
-// const allThemAs = document.querySelectorAll("a");
-// allThemAs.forEach((el) => {
-//   el.href = "./item.html";
-// });
-
-// window.addEventListener("hashchange", getData);
-const addingwatch = document.getElementById("add-watch");
-addingwatch.addEventListener("click", InsertData);
