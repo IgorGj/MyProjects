@@ -12,6 +12,7 @@ import {
   doc,
   onSnapshot,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
+import { theBestFunc } from "./listing.js";
 import {
   getStorage,
   ref as sRef,
@@ -34,8 +35,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+export const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
 const imgOfWatch = document.getElementById("img-of-watch");
 
 let files = [];
@@ -123,8 +124,11 @@ const theCollection = query(collection(db, "watches"));
 const makingTheListing = onSnapshot(theCollection, (snapshot) => {
   snapshot.docChanges().forEach((change) => {
     if (change.type === "added") {
+      const theUid = change.doc.id;
+
       let theCard = document.createElement("div");
       theCard.setAttribute("style", "cursor:pointer");
+      theCard.setAttribute("id", `${theUid}`);
       theCard.classList.add("col", "mt-5");
       let thecardForWatch = document.createElement("div");
       thecardForWatch.classList.add("card", "w-100");
@@ -160,7 +164,6 @@ const makingTheListing = onSnapshot(theCollection, (snapshot) => {
         ageOfWatch = "Не се знае!";
       }
       theageOfWatch.innerHTML = "Година на производство: " + ageOfWatch;
-      console.log(ageOfWatch);
       theBestFunc();
     }
     if (change.type === "modified") {
