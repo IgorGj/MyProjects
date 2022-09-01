@@ -11,6 +11,7 @@
 
     <!-- local CSS -->
     <link rel="stylesheet" href="./assets/css/style.css" />
+    <link rel="stylesheet" href="./myStyles/item.css" />
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -37,86 +38,30 @@
             <a class="nav-link" href="#">About Us</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Log In</a>
+            <a class="nav-link" href="./signIn.html">Log In</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="./signup.html">Sign Up</a>
+            <a class="nav-link" href="./signup.html" id="sign-up">Sign Up</a>
           </li>
         </ul>
       </div>
     </nav>
-    <div class="container-fluid" id="the-container">
-      <div
-        class="row row-cols-1 row-cols-sm-2 row-cols-md-4"
-        id="important-row"
-      >
-        <div class="col mt-5">
-          <div class="card w-100">
-            <img src="./img/pelican.jpg" class="card-img-top" alt="..." />
-            <div class="card-body">
-              <h5 class="card-title">da</h5>
-              <h5 class="card-title agedWatch">da</h5>
-              <p class="card-text">
-                Some quick example text to build on the card title and make up
-                the bulk of the card's content.
-              </p>
-              <a href="#" class="btn btn-primary">Go somewhere</a>
-            </div>
-          </div>
-        </div>
-        <div class="col mt-5">
-          <div class="card w-100">
-            <img src="./img/panda.jpg" class="card-img-top" alt="..." />
-            <div class="card-body">
-              <h5 class="card-title">ne</h5>
-              <h5 class="card-title agedWatch">ne</h5>
-              <p class="card-text">
-                Some quick example text to build on the card title and make up
-                the bulk of the card's content.
-              </p>
-              <a href="#" class="btn btn-primary">Go somewhere</a>
-            </div>
-          </div>
-        </div>
-        <div class="col mt-5">
-          <div class="card w-100">
-            <img src="./img/hippo.jpg" class="card-img-top" alt="..." />
-            <div class="card-body">
-              <h5 class="card-title">Card</h5>
-              <h5 class="card-title agedWatch">Card</h5>
-              <p class="card-text">
-                Some quick example text to build on the card title and make up
-                the bulk of the card's content.
-              </p>
-              <a href="#" class="btn btn-primary">Go somewhere</a>
-            </div>
-          </div>
-        </div>
-        <div id="first-try" class="col mt-5 the-listing">
-          <div class="card w-100">
-            <img src="./img/cat.jpg" class="card-img-top" alt="..." />
-            <div class="card-body">
-              <h5 class="card-titles">Card title</h5>
-              <h5 class="card-title agedWatch">Card title</h5>
-              <p class="card-text">
-                Some quick example text to build on the card title and make up
-                the bulk of the card's content.
-              </p>
-              <a href="./listing.html" class="">Go SomeWhere</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="d-flex justify-content-center mt-5">
       <button
         type="button"
         class="btn btn-primary"
         data-toggle="modal"
         data-target="#staticBackdrop"
+        id="user-add-watch"
       >
         Add a Watch
       </button>
+    </div>
+    <div class="container pt-5" id="the-container">
+      <div
+        class="row row-cols-1 row-cols-sm-2 row-cols-md-4"
+        id="important-row"
+      ></div>
     </div>
 
     <!-- Button trigger modal -->
@@ -148,7 +93,7 @@
           </div>
           <div class="modal-body">
             <form>
-              <div class="form-group">
+              <div class="form-group" id="watch-form">
                 <input
                   id="watch-brand"
                   class="form-control form-control-lg mb-5"
@@ -174,13 +119,14 @@
                   rows="3"
                   placeholder="Опис на часовникот"
                 ></textarea>
-                <label for="exampleFormControlFile1">Example file input</label>
+                <label for="exampleFormControlFile1">Слики од часовникот</label>
                 <input
                   id="img-of-watch"
                   type="file"
                   class="form-control-file"
                   id="exampleFormControlFile1"
                   accept="image/png, image/jpeg, image/jpg"
+                  multiple
                 />
               </div>
             </form>
@@ -208,6 +154,7 @@
 
     <!-- ON THE BOTTOM INSIDE THE BODY TAG -->
     <!-- JQUERY CDN -->
+
     <script src="./assets/js/jquery-3.6.0.min.js"></script>
 
     <!-- POPPER CDN -->
@@ -215,7 +162,7 @@
 
     <!-- BOOTSTRAP JS -->
     <script src="./assets/js/bootstrap.min.js"></script>
-    <script src="./listing.js" type="module"></script>
+    <!-- <script src="./listing.js" type="module"></script> -->
     <script src="./item.js" type="module"></script>
   </body>
 </html>

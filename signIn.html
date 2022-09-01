@@ -5,13 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="./myStyles/signUp.css">
+    <link rel="stylesheet" href="./myStyles/signIn.css">
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
     />
     <style>
-
+     
     </style>
     <title>Document</title>
   </head>
@@ -38,7 +38,7 @@
             <a class="nav-link" href="#">About Us</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="./signIn.html">Log In</a>
+            <a class="nav-link" href="#">Log In</a>
           </li>
           <li class="nav-item active">
             <a class="nav-link" href="./signup.html">Sign Up</a>
@@ -46,7 +46,6 @@
         </ul>
       </div>
     </nav>
-
     <div id="loader"></div>
 
     </div>
@@ -61,7 +60,7 @@
       <div class="col-6 text-center">
         <div class="card">
           <div class="card-body" id="sign-in-card">
-            <h5 class="card-title">Sign-in with GOOGLE / FACEBOOK</h5>
+            <h5 class="card-title">Log-In with GOOGLE / FACEBOOK</h5>
 
             <button id="google" class="mt-3 btn btn-warning">
               <i class="fa-brands fa-google fa-3x"></i>
@@ -70,10 +69,13 @@
               <i class="fa-brands fa-facebook fa-3x"></i>
             </button>
             <h5 class="card-text mt-3">
-              Or create your own Watch Sale Site Mk account
+            Log-In With Watch Sale Site Mk Account
             </h5>
-            <button class="btn btn-info" id="watch-mk-acc">
-              Create An Account
+              <input required type="email" id="login-email" placeholder="Type Your E-mail" style="display:block; margin:1rem auto; width:50%" class="form-control">
+              <input required type="password" id="login-pass" placeholder="Type Your Password" style="display:block; margin:0 auto 1rem; width:50%" class="form-control">
+
+              <button class="btn btn-info" id="login-btn">
+              Log in
             </button>
           </div>
         </div>
@@ -90,6 +92,6 @@
 
     <!-- BOOTSTRAP JS -->
     <script src="./assets/js/bootstrap.min.js"></script>
-    <script src="./signup.js" type="module"></script>
+    <script src="./signIn.js" type="module"></script>
   </body>
 </html>
