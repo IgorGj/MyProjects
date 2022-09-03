@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <link rel="stylesheet" href="./myStyles/myWatches.css" />
+    <link rel="stylesheet" href="./myStyles/item.css" />
+
+    <title>Document</title>
+    <style></style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="./index.html">Watch Sale Mk</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="./index.html"
+              >Home <span class="sr-only">(current)</span></a
+            >
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="./myWatches.html">My Watches</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./signIn.html">Log In</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="./signup.html" id="sign-up">Sign Up</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- Button trigger modal -->
+
+    <!-- <div class="modal-backdrop fade show"></div> -->
+    <div class="container pt-5" id="the-container">
+      <div class="row row-cols-lg-4" id="important-row"></div>
+    </div>
+    <div id="myModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content text-center">
+        <span class="close">&times;</span>
+        <p>You are not logged in or your don't have an account</p>
+        <a href="./signIn.html" class="btn btn-info d-block w-25 mx-auto mt-2"
+          >Log In</a
+        >
+        <a href="./signIn.html" class="btn btn-info w-25 mx-auto mt-2"
+          >Sign Up</a
+        >
+      </div>
+    </div>
+
+    <script src="./assets/js/jquery-3.6.0.min.js"></script>
+
+    <!-- POPPER CDN -->
+    <script src="./assets/js/popper.min.js"></script>
+
+    <!-- BOOTSTRAP JS -->
+    <script src="./assets/js/bootstrap.min.js"></script>
+    <script src="./myWatches.js" type="module"></script>
+  </body>
+</html>

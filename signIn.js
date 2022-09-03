@@ -1,5 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-app.js";
-import * as firebaseui from "https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js";
+import { app } from "./baseSetup.js";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -7,75 +6,100 @@ import {
   signInWithEmailAndPassword,
   signOut,
   signInWithPopup,
+  onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-auth.js";
-const firebaseConfig = {
-  apiKey: "AIzaSyAmsKYsU_0LQkC2KGFxRvzNV9dcmkWiqP0",
-  authDomain: "watchsalesite-f6af0.firebaseapp.com",
-  databaseURL: "https://watchsalesite-f6af0-default-rtdb.firebaseio.com",
-  projectId: "watchsalesite-f6af0",
-  storageBucket: "watchsalesite-f6af0.appspot.com",
-  messagingSenderId: "21745374690",
-  appId: "1:21745374690:web:fa3faec6184db9f08415bb",
-};
-const app = initializeApp(firebaseConfig);
+
 const googleProvider = new GoogleAuthProvider();
 const facebookProvider = new FacebookAuthProvider();
-const auth = getAuth();
+const auth = getAuth(app);
 
+const googleBtn = document.getElementById("google");
+const facebookBtn = document.getElementById("facebook");
 const loginBtn = document.getElementById("login-btn");
 const loginEmail = document.querySelector("#login-email");
 const loginPass = document.querySelector("#login-pass");
+
+const theLoadingScreen = () => {
+  const signRow = document.getElementById("sign-in-card").parentElement;
+
+  let widthChange = 1;
+  const theInterval = setInterval(() => {
+    widthChange++;
+    if (widthChange === 100 || widthChange >= 100) {
+      widthChange = 100;
+    }
+
+    signRow.innerHTML = `<div id="outer-progress" style="display:inline-block; width:100%; height:30px; background-color:gray; text-align:center"><div id="inner-progress" style="display:inline-block;height:100%;background-color: red; width:${widthChange}%; "></div><h2>Logging into your account</h2></div>`;
+  }, 30.333333);
+
+  // clearInterval(theInterval);
+  // window.location.href = "./index.html";
+};
+
+googleBtn.addEventListener("click", () => {
+  theLoadingScreen();
+  signInWithPopup(auth, googleProvider)
+    .then((result) => {
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      // ...
+    })
+    .catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.customData.email;
+      // The AuthCredential type that was used.
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      // ...
+    });
+});
+
+facebookBtn.addEventListener("click", () => {
+  theLoadingScreen();
+
+  signInWithPopup(auth, facebookProvider)
+    .then((result) => {
+      // The signed-in user info.
+      const user = result.user;
+
+      // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+      const credential = FacebookAuthProvider.credentialFromResult(result);
+      const accessToken = credential.accessToken;
+
+      // ...
+    })
+    .catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.customData.email;
+      // The AuthCredential type that was used.
+      const credential = FacebookAuthProvider.credentialFromError(error);
+
+      // ...
+    });
+});
 loginBtn.addEventListener("click", () => {
   let email = loginEmail.value;
   let password = loginPass.value;
-  // auth
-  //   .signInWithEmailAndPassword(email, password)
-  //   .then(function () {
-  //     // Declare user variable
-  //     var user = auth.currentUser;
 
-  //     // Add this user to Firebase Database
-  //     var database_ref = database.ref();
+  document.getElementById("loader").style.display = "block";
+  signRow.style.display = "none";
 
-  //     // Create User data
-  //     var user_data = {
-  //       last_login: Date.now(),
-  //     };
-
-  //     // Push to Firebase Database
-  //     database_ref.child("users/" + user.uid).update(user_data);
-
-  //     // DOne
-  //     alert("User Logged In!!");
-  //   })
-  //   .catch(function (error) {
-  //     // Firebase will use this to alert of its errors
-  //     var error_code = error.code;
-  //     var error_message = error.message;
-
-  //     alert(error_message);
-  //   });
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const signRow = document.getElementById("sign-in-card").parentElement;
       // Signed in
+      document.getElementById("loader").style.display = "none";
+      window.location.href = "./index.html";
       const user = userCredential.user;
-      let widthChange = 1;
-      console.log(userCredential.user.email);
-      const theInterval = setInterval(() => {
-        widthChange++;
-        if (widthChange === 100 || widthChange >= 100) {
-          widthChange = 100;
-        }
-        document.getElementById("loader").style.display = "block";
-        signRow.innerHTML = `<div id="outer-progress" style="display:inline-block; width:100%; height:30px; background-color:gray; text-align:center"><div id="inner-progress" style="display:inline-block;height:100%;background-color: red; width:${widthChange}%; "></div><h2>Logging into your account</h2></div>`;
-      }, 30.333333);
-      setTimeout(() => {
-        clearInterval(theInterval);
-        window.location.href = "./index.html";
-      }, 3000);
-      // window.location.href = "./index.html";
-      // ...
+      console.log(userCredential.user);
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -83,10 +107,36 @@ loginBtn.addEventListener("click", () => {
     });
 });
 
-auth.onAuthStateChanged((user) => {
-  if (user) {
-    console.log(user);
-  } else {
-    console.log("Nema user");
+const signUp = document.querySelector("#sign-up");
+signUp.addEventListener("click", (e) => {
+  if (signUp.textContent === "Sign Out") {
+    e.preventDefault();
   }
+});
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    signUp.textContent = "Sign Out";
+    // ...
+  } else {
+    signUp.textContent = "Sign Up";
+  }
+});
+
+window.addEventListener("click", (e) => {
+  if (e.target.textContent === "Sign Out") {
+    if (confirm("Do You Want To Sign Out?") === true) {
+      signOut(auth)
+        .then(() => {
+          console.log(auth.currentUser);
+          console.log("sign-oout succ");
+
+          // Sign-out successful.
+        })
+        .catch((error) => {
+          // An error happened.
+          console.log("bad hpn");
+        });
+    }
+  }
+  return;
 });

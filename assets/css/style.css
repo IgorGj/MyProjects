@@ -1,0 +1,9 @@
+.nav-item.active {
+  text-decoration: underline;
+  font-weight: bolder;
+}
+
+.nav-link:hover {
+  color: red !important;
+  font-size: 1.25rem;
+}

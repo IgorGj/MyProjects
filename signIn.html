@@ -5,7 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="./myStyles/signIn.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
+
+    <link rel="stylesheet" href="./myStyles/item.css" />
+
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
@@ -15,7 +18,7 @@
     </style>
     <title>Document</title>
   </head>
-  <body>
+  <body style="overflow-x: hidden;">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <a class="navbar-brand" href="./index.html">Watch Sale Mk</a>
       <button
@@ -35,18 +38,20 @@
             <a class="nav-link" href="./index.html">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">About Us</a>
+            <a class="nav-link" href="./myWatches.html">My Watches</a>
+          </li>
+          <li class="nav-item  active">
+            <a class="nav-link" href="./signIn.html">Log In</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Log In</a>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" href="./signup.html">Sign Up</a>
+            <a class="nav-link" href="./signup.html" id="sign-up">Sign Up</a>
           </li>
         </ul>
       </div>
     </nav>
-    <div id="loader"></div>
+    <div style="position:absolute;top:50%; left:50%; transform: translate(-50%,-50%);">
+      <div id="loader"></div>
+    </div>
 
     </div>
     <div class="container text-center">
@@ -56,8 +61,8 @@
       </h4>
       <h4>But first we need you to sign-up</h4>
     </div>
-    <div class="row justify-content-center mt-5" id="signRow">
-      <div class="col-6 text-center">
+    <div class="row row-cols-md-2 justify-content-center mt-5" id="signRow">
+      <div class="col text-center">
         <div class="card">
           <div class="card-body" id="sign-in-card">
             <h5 class="card-title">Log-In with GOOGLE / FACEBOOK</h5>

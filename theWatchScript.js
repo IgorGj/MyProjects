@@ -4,6 +4,12 @@ import {
   doc,
   getDoc,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
+import {
+  getAuth,
+  signOut,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/9.9.2/firebase-auth.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAmsKYsU_0LQkC2KGFxRvzNV9dcmkWiqP0",
   authDomain: "watchsalesite-f6af0.firebaseapp.com",
@@ -69,3 +75,35 @@ if (docSnap.exists()) {
     "Година на производство: " + theDocumentSnap.prodYear;
   theWatchDescription.textContent = theDocumentSnap.description;
 }
+
+const signUp = document.querySelector("#sign-up");
+const auth = getAuth();
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in, see docs for a list of available properties
+    // https://firebase.google.com/docs/reference/js/firebase.User
+    signUp.textContent = "Sign Out";
+    // ...
+  } else {
+    signUp.textContent = "Sign Up";
+  }
+});
+
+window.addEventListener("click", (e) => {
+  if (e.target.textContent === "Sign Out") {
+    if (confirm("Do You Want To Sign Out?") === true) {
+      signOut(auth)
+        .then(() => {
+          console.log(auth.currentUser);
+          console.log("sign-oout succ");
+
+          // Sign-out successful.
+        })
+        .catch((error) => {
+          // An error happened.
+          console.log("bad hpn");
+        });
+    }
+  }
+  return;
+});

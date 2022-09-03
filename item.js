@@ -1,19 +1,14 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-app.js";
-import {
-  addDoc,
-  getDocs,
-  getDoc,
-  setDoc,
-  updateDoc,
-} from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
+import { app } from "./baseSetup.js";
 import {
   getFirestore,
   collection,
   query,
   doc,
   onSnapshot,
+  addDoc,
+  getDocs,
+  updateDoc,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
-// import { theBestFunc } from "./listing.js";
 import {
   getStorage,
   ref as sRef,
@@ -27,22 +22,6 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-auth.js";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAmsKYsU_0LQkC2KGFxRvzNV9dcmkWiqP0",
-  authDomain: "watchsalesite-f6af0.firebaseapp.com",
-  databaseURL: "https://watchsalesite-f6af0-default-rtdb.firebaseio.com",
-  projectId: "watchsalesite-f6af0",
-  storageBucket: "watchsalesite-f6af0.appspot.com",
-  messagingSenderId: "21745374690",
-  appId: "1:21745374690:web:fa3faec6184db9f08415bb",
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage();
 
@@ -74,37 +53,6 @@ const addingWatches = document.getElementById("add-watch");
 addingWatches.addEventListener("click", saveURLtoFirestore);
 let allUrls = [];
 
-// async function uploadProcess() {
-//   let imgtoUpload = files;
-//   console.log([...files]);
-//   [...files].forEach((el) => {
-//     let imgName = new Date();
-//     // set metadata so if the user doesn't chose an image he can't make a listing.
-//     const metaData = {
-//       contentType: el.type,
-//     };
-//     const storageRef = sRef(storage, "images/" + el.name);
-//     const uploadTask = uploadBytesResumable(storageRef, el, metaData);
-//     uploadTask.on(
-//       "state-changed",
-//       (snapshot) => {
-//         let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-//         console.log(progress);
-//       },
-//       (error) => {
-//         alert("not uploaded");
-//       },
-//       function downURL() {
-//         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-//           allUrls.push(downloadURL);
-//           saveURLtoFirestore(allUrls);
-//         });
-//       }
-//     );
-//   });
-//   allUrls = [];
-// }
-
 async function saveURLtoFirestore(url) {
   // let imagName = new Date().toGMTString();
   let imagName = new Date();
@@ -115,6 +63,9 @@ async function saveURLtoFirestore(url) {
   const watchModel = document.getElementById("watch-model");
   const watchProdYear = document.getElementById("watch-age");
   const descOfWatch = document.getElementById("desc-of-watch");
+
+  const auth = getAuth();
+  const user = auth.currentUser;
   // await setDoc(doc(db, "watches", imagName), {
   //   brand: watchBrand.value,
   //   model: watchModel.value,
@@ -124,6 +75,7 @@ async function saveURLtoFirestore(url) {
   //   imageName: new Date(),
   // });
   const docRefWithId = await addDoc(collection(db, "watches"), {
+    userId: user.uid,
     imageName: imagName,
     imgUrl: [],
     brand: watchBrand.value,
@@ -132,23 +84,6 @@ async function saveURLtoFirestore(url) {
     description: descOfWatch.value,
   });
 
-  console.log("Document written with ID: ", docRefWithId.id);
-
-  // const docRef = doc(db, "cities", "yftq9RGp4jWNSyBZ1D6L");
-
-  // const data = {
-  //   code: "613",
-  // };
-
-  // updateDoc(docRef, data)
-  //   .then((docRef) => {
-  //     console.log(
-  //       "A New Document Field has been added to an existing document"
-  //     );
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //   });
   async function uploadProcess() {
     let imgtoUpload = [...files];
     console.log([...files]);
@@ -172,6 +107,7 @@ async function saveURLtoFirestore(url) {
         },
         async function downURL() {
           const docRef = doc(db, "watches", docRefWithId.id);
+          // const docRef = doc(db, "watches", user.uid);
 
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             allUrls.push(downloadURL);
@@ -200,9 +136,7 @@ async function saveURLtoFirestore(url) {
   watchModel.value = "";
   watchProdYear.value = "";
   descOfWatch.value = "";
-  // setTimeout(() => {
-  //   window.location.href = "./index.html";
-  // }, 3000);
+
   // url = "";
 }
 let theContainer = document.querySelector("#important-row");
@@ -216,23 +150,38 @@ setTimeout(() => {
   console.log(theListing);
 }, 2000);
 
+const auth = getAuth();
+const signUp = document.querySelector("#sign-up");
+
 const theCollection = query(collection(db, "watches"));
+
 const makingTheListing = onSnapshot(theCollection, (snapshot) => {
   snapshot.docChanges().forEach((change) => {
+    const user = auth.currentUser;
+
     if (change.type === "added") {
+      const auth = getAuth();
+      const signUp = document.querySelector("#sign-up");
+      const user = auth.currentUser;
       console.log(change.doc.data().imgUrl);
       let theUid = change.doc.id;
       theUid = theUid.replace(/ +/g, "");
       console.log(theUid);
       let theCard = document.createElement("div");
-      theCard.setAttribute("style", "cursor:pointer");
       theCard.setAttribute("id", `${theUid}`);
       theCard.classList.add("col", "mb-5");
       let thecardForWatch = document.createElement("div");
       thecardForWatch.classList.add("card", "w-100", "h-100");
       let theimgOfWatch = document.createElement("img");
       theimgOfWatch.classList.add("card-img-top");
+      let theLoader = document.createElement("div");
+      theLoader.setAttribute("id", "loader");
+      const loaderParent = document.createElement("div");
 
+      loaderParent.setAttribute(
+        "style",
+        "position:absolute;top:50%; left:50%; transform: translate(-50%,-50%);"
+      );
       let thedescriptionOfWatch = document.createElement("div");
       thedescriptionOfWatch.classList.add("card-body");
       let thenameOfWatch = document.createElement("h5");
@@ -268,7 +217,11 @@ const makingTheListing = onSnapshot(theCollection, (snapshot) => {
         theageOfWatch,
         theshortDescWatch
       );
-      thecardForWatch.append(theimgOfWatch);
+      theLoader.style.display = "block";
+
+      loaderParent.append(theLoader);
+
+      thecardForWatch.append(loaderParent, theimgOfWatch);
       thecardForWatch.append(thedescriptionOfWatch, theCardFooter);
       theCard.append(thecardForWatch);
       theContainer.appendChild(theCard);
@@ -279,8 +232,12 @@ const makingTheListing = onSnapshot(theCollection, (snapshot) => {
       console.log(change.doc.data().imgUrl);
 
       const srcOfImg = change.doc.data().imgUrl;
+      theimgOfWatch.addEventListener("load", () => {
+        theLoader.style.display = "none";
+      });
       theimgOfWatch.src = srcOfImg;
       thenameOfWatch.innerHTML = modelOfWatch;
+
       if (ageOfWatch === "") {
         ageOfWatch = "Не се знае!";
       }
@@ -289,14 +246,25 @@ const makingTheListing = onSnapshot(theCollection, (snapshot) => {
         descWatch = "Нема детално објаснување за часовникот!";
       }
       theshortDescWatch.textContent = descWatch;
+      console.log(user);
 
+      if (user !== null) {
+        console.log(user.uid);
+        user.providerData.forEach((profile) => {
+          console.log("Sign-in provider: " + profile.providerId);
+          console.log("  Provider-specific UID: " + profile.uid);
+          console.log("  Name: " + profile.contactInfo);
+          console.log("  Email: " + profile.email);
+          console.log("  Photo URL: " + profile.photoURL);
+        });
+      }
       // theBestFunc();
     }
     if (change.type === "modified") {
       const theUid = change.doc.id;
-
       const theCard = document.getElementById(`${theUid}`);
       const img = theCard.querySelector(".card-img-top");
+
       img.src = change.doc.data().imgUrl;
       console.log("Modified city: ", change.doc.id);
     }
@@ -306,108 +274,11 @@ const makingTheListing = onSnapshot(theCollection, (snapshot) => {
   });
 });
 
-const auth = getAuth();
-const signUp = document.querySelector("#sign-up");
-// const user = auth.currentUser;
-
-// setTimeout(() => {
-//   if (auth.currentUser !== null) {
-//     console.log(auth.currentUser);
-//     signUp.textContent = "Sign Out";
-//   }
-// }, 3000);
-// auth.onAuthStateChanged((user) => {
-
-//   console.log(user);
-
-// });
-
 signUp.addEventListener("click", (e) => {
   e.preventDefault();
-  if (auth.currentUser) {
-    signOut(auth)
-      .then(() => {
-        console.log(auth.currentUser);
-        console.log("sign-oout succ");
-
-        // Sign-out successful.
-      })
-      .catch((error) => {
-        // An error happened.
-        console.log("bad hpn");
-      });
-  } else {
-    console.log("njama user");
+  if (e.currentTarget.textContent === "Sign Up") {
     window.location.href = "./signup.html";
   }
-
-  // auth.onAuthStateChanged((user) => {
-  //   if (user) {
-  //     signUp.textContent = "Sign Out";
-  //     signOut(auth)
-  //       .then(() => {
-  //         console.log("sign-oout succ");
-  //         console.log(user);
-
-  //         // Sign-out successful.
-  //       })
-  //       .catch((error) => {
-  //         // An error happened.
-  //         console.log("bad hpn");
-  //       });
-  //   } else {
-  //     console.log("njama juseru");
-  //   }
-  //   return;
-
-  // });
-
-  // onAuthStateChanged(auth, (user) => {
-  //   if (user) {
-  //     // User is signed in, see docs for a list of available properties
-  //     // https://firebase.google.com/docs/reference/js/firebase.User
-  //     // signUp.textContent = "Sign out";
-  //     signOut(auth)
-  //       .then(() => {
-  //         console.log("sign-oout succ");
-  //         console.log(user);
-
-  //         // Sign-out successful.
-  //       })
-  //       .catch((error) => {
-  //         // An error happened.
-  //       });
-  //     // ...
-  //   } else {
-  //     // User is signed out
-  //     // ...
-  //     signUp.textContent = "Sign In";
-  //     window.location.href = "./signup.html";
-  //   }
-  // });
-
-  // if (user !== null) {
-  //   console.log(user);
-
-  //   signUp.textContent = "Sign Out";
-
-  //   if (confirm("Do you want to SIGN-OUT?") === true) {
-  //     signOut(auth)
-  //       .then(() => {
-  //         // Sign-out successful.
-  //         console.log("sign out successfull");
-  //         signUp.textContent = "Sign In";
-  //       })
-  //       .catch((error) => {
-  //         // An error happened.
-  //       });
-  //   } else {
-  //     return;
-  //   }
-  // } else if (user === null) {
-  //   // window.location.href = "./signup.html";
-  //   console.log(user);
-  // }
 });
 
 onAuthStateChanged(auth, (user) => {
@@ -422,4 +293,23 @@ onAuthStateChanged(auth, (user) => {
     userAddingWatch.style.display = "none";
     signUp.textContent = "Sign Up";
   }
+});
+
+window.addEventListener("click", (e) => {
+  if (e.target.textContent === "Sign Out") {
+    if (confirm("Do You Want To Sign Out?") === true) {
+      signOut(auth)
+        .then(() => {
+          console.log(auth.currentUser);
+          console.log("sign-oout succ");
+
+          // Sign-out successful.
+        })
+        .catch((error) => {
+          // An error happened.
+          console.log("bad hpn");
+        });
+    }
+  }
+  return;
 });

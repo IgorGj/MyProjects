@@ -1,23 +1,16 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-app.js";
-import * as firebaseui from "https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js";
+import { app } from "./baseSetup.js";
 import {
   getAuth,
   GoogleAuthProvider,
   FacebookAuthProvider,
   createUserWithEmailAndPassword,
-  signOut,
   signInWithPopup,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-auth.js";
-const firebaseConfig = {
-  apiKey: "AIzaSyAmsKYsU_0LQkC2KGFxRvzNV9dcmkWiqP0",
-  authDomain: "watchsalesite-f6af0.firebaseapp.com",
-  databaseURL: "https://watchsalesite-f6af0-default-rtdb.firebaseio.com",
-  projectId: "watchsalesite-f6af0",
-  storageBucket: "watchsalesite-f6af0.appspot.com",
-  messagingSenderId: "21745374690",
-  appId: "1:21745374690:web:fa3faec6184db9f08415bb",
-};
-const app = initializeApp(firebaseConfig);
+
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
+
+const db = getFirestore(app);
+
 const googleProvider = new GoogleAuthProvider();
 const facebookProvider = new FacebookAuthProvider();
 const auth = getAuth();
@@ -26,7 +19,24 @@ const googleBtn = document.getElementById("google");
 const facebookBtn = document.getElementById("facebook");
 const createWatchMkAcc = document.getElementById("watch-mk-acc");
 const signInCard = document.getElementById("sign-in-card");
+const theLoadingScreen = () => {
+  document.getElementById("loader").style.display = "block";
+  let widthChange = 1;
+  const theInterval = setInterval(() => {
+    widthChange++;
+    if (widthChange === 100 || widthChange >= 100) {
+      widthChange = 100;
+    }
+
+    signRow.innerHTML = `<div id="outer-progress" style="display:inline-block; width:100%; height:30px; background-color:gray; text-align:center"><div id="inner-progress" style="display:inline-block;height:100%;background-color: red; width:${widthChange}%; "></div><h2>Creating Your Account</h2></div>`;
+  }, 30.333333);
+  setTimeout(() => {
+    clearInterval(theInterval);
+    window.location.href = "./index.html";
+  }, 3000);
+};
 googleBtn.addEventListener("click", () => {
+  theLoadingScreen();
   signInWithPopup(auth, googleProvider)
     .then((result) => {
       // This gives you a Google Access Token. You can use it to access the Google API.
@@ -34,6 +44,7 @@ googleBtn.addEventListener("click", () => {
       const token = credential.accessToken;
       // The signed-in user info.
       const user = result.user;
+
       // ...
     })
     .catch((error) => {
@@ -48,6 +59,8 @@ googleBtn.addEventListener("click", () => {
     });
 });
 facebookBtn.addEventListener("click", () => {
+  theLoadingScreen();
+
   signInWithPopup(auth, facebookProvider)
     .then((result) => {
       // The signed-in user info.
@@ -75,6 +88,11 @@ const createMyAccBtn = document.createElement("button");
 const emailInput = document.createElement("input");
 const passInput = document.createElement("input");
 const confirmPassInput = document.createElement("input");
+const passwordRequirements = document.createElement("small");
+const passwordsNotMatching = document.createElement("small");
+const validatingEmail = document.createElement("small");
+// const fullName = document.createElement("input");
+// const contact = document.createElement("input");
 
 emailInput.required = true;
 emailInput.setAttribute("type", "email");
@@ -97,31 +115,97 @@ confirmPassInput.setAttribute(
 );
 confirmPassInput.classList.add("form-control");
 
+validatingEmail.textContent = "The email you entered is incorrect!";
+validatingEmail.setAttribute(
+  "style",
+  "color:red; display:none; margin-bottom:1rem;"
+);
+passwordRequirements.textContent =
+  "The Password Must Be Atleast 8 Characters Long";
+passwordRequirements.setAttribute("style", "display:none");
+
+passwordsNotMatching.textContent = "Your Passwords Are not Matching!";
+passwordsNotMatching.setAttribute("style", " display:none");
+
+// fullName.setAttribute("type", "text");
+// fullName.setAttribute("placeholder", "Your Full Name");
+// fullName.classList.add("form-control");
+// fullName.setAttribute("style", "display:block; margin:1rem auto; width:50%");
+
+// contact.setAttribute("type", "tel");
+// contact.setAttribute("placeholder", "Your Mobile Number");
+// contact.classList.add("form-control");
+// contact.setAttribute("style", "display:block; margin:1rem auto; width:50%");
+
 createWatchMkAcc.addEventListener("click", () => {
   createMyAccBtn.textContent = "Create My Account";
   createMyAccBtn.classList.add("btn", "btn-sm", "btn-info");
 
-  signInCard.append(emailInput, passInput, confirmPassInput, createMyAccBtn);
+  signInCard.append(
+    emailInput,
+    validatingEmail,
+    passInput,
+    passwordRequirements,
+    confirmPassInput,
+    passwordsNotMatching,
+    createMyAccBtn
+  );
 });
 
-// let dynamicWidth = 0;
-// const myProgressBar = () => {
-//   if (dynamicWidth === 0) {
-//     dynamicWidth = 1;
-//     let width = 1;
-//     let progressBarWorking = setInterval(fps, 10);
+const validateEmail = (email) => {
+  var re = /\S+@\S+\.\S+/;
+  return re.test(email);
+};
 
-//     function fps() {
-//       if (width >= 100) {
-//         clearInterval(progressBarWorking);
-//         // dynamicWidth = 0;
-//       } else {
-//         width++;
-//         innerProgress.style.width = `${width}%`;
-//       }
-//     }
-//   }
-// };
+emailInput.addEventListener("keyup", () => {
+  if (!validateEmail(emailInput.value)) {
+    console.log("incorrect email");
+    validatingEmail.style.display = "block";
+    emailInput.style.borderColor = "red";
+    emailInput.style.marginBottom = "0";
+  } else {
+    emailInput.style.borderColor = "green";
+    validatingEmail.style.display = "none";
+    emailInput.style.marginBottom = "1rem";
+  }
+});
+
+const returningPassValue = () => {
+  return passInput.value;
+};
+passInput.addEventListener("focus", () => {
+  returningPassValue();
+  passwordRequirements.setAttribute("style", "display:block");
+});
+
+passInput.addEventListener("keyup", () => {
+  console.log(passInput.value.length);
+  if (passInput.value.length <= 8) {
+    passwordRequirements.setAttribute("style", "color:red");
+  } else {
+    passwordRequirements.setAttribute("style", "color:green");
+    passInput.style.borderColor = "green";
+  }
+});
+passInput.addEventListener("blur", () => {
+  if (passInput.value.length > 8) {
+    passwordRequirements.setAttribute("style", "display:none");
+  }
+});
+
+confirmPassInput.addEventListener("blur", () => {
+  const passwordValue = returningPassValue();
+  if (confirmPassInput.value !== passwordValue) {
+    passwordsNotMatching.setAttribute(
+      "style",
+      "color:red;display:block; margin-bottom: 1rem;"
+    );
+    confirmPassInput.style.marginBottom = "0px";
+  } else {
+    confirmPassInput.style.borderColor = "green";
+  }
+});
+
 const signRow = document.getElementById("sign-in-card").parentElement;
 
 createMyAccBtn.addEventListener("click", () => {
@@ -153,9 +237,8 @@ createMyAccBtn.addEventListener("click", () => {
     signRow.insertBefore(smallOne, confirmPassInput);
     return;
   } else if (passInput.value === confirmPassInput.value) {
-    const rightPassword = confirmPassInput.value;
-
-    console.log(rightPassword);
+    document.getElementById("loader").style.display = "block";
+    signRow.style.display = "none";
     createUserWithEmailAndPassword(
       auth,
       emailInput.value,
@@ -163,8 +246,17 @@ createMyAccBtn.addEventListener("click", () => {
     )
       .then((userCredential) => {
         // Signed in
+
+        // const db = getDatabase();
+        const signRow = document.getElementById("sign-in-card").parentElement;
+        // Signed in
+        document.getElementById("loader").style.display = "none";
+        window.location.href = "./index.html";
         const user = userCredential.user;
-        // ...
+        console.log(user.uid);
+        const userUid = user.uid; // The UID of the user.
+        const email = user.email; // The email of the user.
+        const displayName = user.displayName; // The display name of the user.
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -172,9 +264,10 @@ createMyAccBtn.addEventListener("click", () => {
         // ..
       });
   }
-  passInput.value = "";
-  confirmPassInput.value = "";
-  emailInput.value = "";
+
+  // passInput.value = "";
+  // confirmPassInput.value = "";
+  // emailInput.value = "";
   let widthChange = 1;
 
   document.getElementById("loader").style.display = "block";
@@ -192,7 +285,3 @@ createMyAccBtn.addEventListener("click", () => {
     window.location.href = "./index.html";
   }, 3000);
 });
-
-// <div id="outer-progress">
-//   <div id="inner-progress"></div>
-// </div>;
