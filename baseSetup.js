@@ -3,16 +3,11 @@ import {
   getFirestore,
   collection,
   query,
-
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
-import {
-  getAuth,
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-auth.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-storage.js";
 
-} from "https://www.gstatic.com/firebasejs/9.9.2/firebase-auth.js";
-import {
-  getStorage,
-
-} from "https://www.gstatic.com/firebasejs/9.9.2/firebase-storage.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAmsKYsU_0LQkC2KGFxRvzNV9dcmkWiqP0",
@@ -30,4 +25,4 @@ export const storage = getStorage(app);
 export const auth = getAuth(app);
 export const user = auth.currentUser;
 export const collectionQuery = query(collection(db, "watches"));
-
+export const database = getDatabase();

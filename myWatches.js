@@ -109,18 +109,8 @@ let creatingModal = () => {
     const watchProdYear = document.getElementById("watch-age");
     const descOfWatch = document.getElementById("desc-of-watch");
 
-    // const auth = getAuth();
-    // const user = auth.currentUser;
-    // await setDoc(doc(db, "watches", imagName), {
-    //   brand: watchBrand.value,
-    //   model: watchModel.value,
-    //   imgUrl: [],
-    //   prodYear: watchProdYear.value,
-    //   description: descOfWatch.value,
-    //   imageName: new Date(),
-    // });
     const docRefWithId = await addDoc(collection(db, "watches"), {
-      userId: user.uid,
+      userId: auth.currentUser.uid,
       imageName: imagName,
       imgUrl: [],
       brand: watchBrand.value,
@@ -189,6 +179,9 @@ let creatingModal = () => {
 };
 
 let creatingWatch = (parametar) => {
+  if (!parametar.doc.id) {
+    console.log("njama parametar.doc.id");
+  }
   let theUid = parametar.doc.id;
   theUid = theUid.replace(/ +/g, "");
   console.log(theUid);
@@ -330,7 +323,7 @@ addingWatches.addEventListener("click", () => {
     //   imageName: new Date(),
     // });
     const docRefWithId = await addDoc(collection(db, "watches"), {
-      userId: user.uid,
+      userId: auth.currentUser.uid,
       imageName: imagName,
       imgUrl: [],
       brand: watchBrand.value,
@@ -571,11 +564,13 @@ onAuthStateChanged(auth, async (user) => {
     }
   } else {
     signUp.textContent = "Sign Up";
+    document.querySelector("#user-add-watch").parentElement.remove();
   }
 });
 
 window.addEventListener("click", (e) => {
   if (e.target.textContent === "Sign Out") {
+    e.preventDefault();
     if (confirm("Do You Want To Sign Out?") === true) {
       signOut(auth)
         .then(() => {
@@ -584,6 +579,8 @@ window.addEventListener("click", (e) => {
         .catch((error) => {
           console.log("bad hpn");
         });
+    } else {
+      return;
     }
   }
   return;

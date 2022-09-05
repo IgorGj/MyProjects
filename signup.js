@@ -1,4 +1,4 @@
-import { app,  auth } from "./baseSetup.js";
+import { app, auth, database } from "./baseSetup.js";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -6,6 +6,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-auth.js";
+import {
+  ref,
+  set,
+} from "https://www.gstatic.com/firebasejs/9.9.2/firebase-database.js";
 
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
 
@@ -37,7 +41,6 @@ googleBtn.addEventListener("click", () => {
   theLoadingScreen();
   signInWithPopup(auth, googleProvider)
     .then((result) => {
-
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const token = credential.accessToken;
       // The signed-in user info.
@@ -86,16 +89,32 @@ const createMyAccBtn = document.createElement("button");
 const emailInput = document.createElement("input");
 const passInput = document.createElement("input");
 const confirmPassInput = document.createElement("input");
+const fullNameInput = document.createElement("input");
+const numberInput = document.createElement("input");
 const passwordRequirements = document.createElement("small");
 const passwordsNotMatching = document.createElement("small");
 const validatingEmail = document.createElement("small");
-
 
 emailInput.required = true;
 emailInput.setAttribute("type", "email");
 emailInput.setAttribute("placeholder", "Type Your E-mail");
 emailInput.setAttribute("style", "display:block; margin:1rem auto; width:50%");
 emailInput.classList.add("form-control");
+
+fullNameInput.required = true;
+fullNameInput.setAttribute("type", "email");
+fullNameInput.setAttribute("placeholder", "Type Your Full Name");
+fullNameInput.setAttribute(
+  "style",
+  "display:block; margin:1rem auto; width:50%"
+);
+fullNameInput.classList.add("form-control");
+
+numberInput.required = true;
+numberInput.setAttribute("type", "email");
+numberInput.setAttribute("placeholder", "Type Your Contact Num");
+numberInput.setAttribute("style", "display:block; margin:1rem auto; width:50%");
+numberInput.classList.add("form-control");
 
 passInput.required = true;
 passInput.setAttribute("type", "password");
@@ -124,12 +143,13 @@ passwordRequirements.setAttribute("style", "display:none");
 passwordsNotMatching.textContent = "Your Passwords Are not Matching!";
 passwordsNotMatching.setAttribute("style", " display:none");
 
-
 createWatchMkAcc.addEventListener("click", () => {
   createMyAccBtn.textContent = "Create My Account";
   createMyAccBtn.classList.add("btn", "btn-sm", "btn-info");
 
   signInCard.append(
+    fullNameInput,
+    numberInput,
     emailInput,
     validatingEmail,
     passInput,
@@ -202,7 +222,6 @@ createMyAccBtn.addEventListener("click", () => {
     passInput.value === "" ||
     confirmPassInput.value === ""
   ) {
-
     emailInput.value === ""
       ? (emailInput.style.borderColor = "red")
       : (emailInput.style.borderColor = "green");
@@ -238,12 +257,26 @@ createMyAccBtn.addEventListener("click", () => {
         const signRow = document.getElementById("sign-in-card").parentElement;
         // Signed in
         document.getElementById("loader").style.display = "none";
-        window.location.href = "./index.html";
+        // window.location.href = "./index.html";
         const user = userCredential.user;
         console.log(user.uid);
         const userUid = user.uid; // The UID of the user.
         const email = user.email; // The email of the user.
         const displayName = user.displayName; // The display name of the user.
+
+        let user_info = {
+          id: userUid,
+          email: emailInput.value,
+          fullName: fullNameInput.value,
+          contactNum: numberInput.value,
+        };
+
+        set(ref(database, "users/" + user_info.id), {
+          fullName: user_info.fullName,
+          email: user_info.email,
+          id: userUid,
+          contactNum: user_info.contactNum,
+        });
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -255,5 +288,4 @@ createMyAccBtn.addEventListener("click", () => {
   // passInput.value = "";
   // confirmPassInput.value = "";
   // emailInput.value = "";
-
 });
