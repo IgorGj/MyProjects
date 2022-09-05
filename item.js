@@ -1,4 +1,4 @@
-import { app } from "./baseSetup.js";
+import { app, db, auth, collectionQuery } from "./baseSetup.js";
 import {
   getFirestore,
   collection,
@@ -9,12 +9,6 @@ import {
   getDocs,
   updateDoc,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
-import {
-  getStorage,
-  ref as sRef,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "https://www.gstatic.com/firebasejs/9.9.2/firebase-storage.js";
 
 import {
   getAuth,
@@ -22,151 +16,53 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-auth.js";
 
-const db = getFirestore(app);
-const storage = getStorage();
+// const db = getFirestore(app);
 
-const imgOfWatch = document.getElementById("img-of-watch");
-let files = [];
-let reader = new FileReader();
-imgOfWatch.onchange = (e) => {
-  files = e.target.files;
-  console.log([...e.target.files]);
-  // let extention = GetFileExt(files[0]);
-  // let theName = GetFileName(files[0]);
-  reader.readAsDataURL(files[0]);
-};
-
-// function GetFileExt(file) {
-//   let temp = file.name.split(".");
-//   let ext = temp.slice(temp.length - 1, temp.length);
-//   return "." + ext[0];
-// }
-
-// function GetFileName(file) {
-//   let temp = file.name.split(".");
-//   let fname = temp.slice(0, -1).join(".");
-//   return fname;
-// }
-
-// Add a new document in collection "wathes"
-const addingWatches = document.getElementById("add-watch");
-addingWatches.addEventListener("click", saveURLtoFirestore);
-let allUrls = [];
-
-async function saveURLtoFirestore(url) {
-  // let imagName = new Date().toGMTString();
-  let imagName = new Date();
-  // imagName = imagName.replace(/ +/g, "");
-  console.log(imagName);
-
-  const watchBrand = document.getElementById("watch-brand");
-  const watchModel = document.getElementById("watch-model");
-  const watchProdYear = document.getElementById("watch-age");
-  const descOfWatch = document.getElementById("desc-of-watch");
-
-  const auth = getAuth();
-  const user = auth.currentUser;
-  // await setDoc(doc(db, "watches", imagName), {
-  //   brand: watchBrand.value,
-  //   model: watchModel.value,
-  //   imgUrl: [],
-  //   prodYear: watchProdYear.value,
-  //   description: descOfWatch.value,
-  //   imageName: new Date(),
-  // });
-  const docRefWithId = await addDoc(collection(db, "watches"), {
-    userId: user.uid,
-    imageName: imagName,
-    imgUrl: [],
-    brand: watchBrand.value,
-    model: watchModel.value,
-    prodYear: watchProdYear.value,
-    description: descOfWatch.value,
-  });
-
-  async function uploadProcess() {
-    let imgtoUpload = [...files];
-    console.log([...files]);
-    [...files].forEach((el) => {
-      let imgName = new Date();
-      // set metadata so if the user doesn't chose an image he can't make a listing.
-      const metaData = {
-        contentType: el.type,
-      };
-      const storageRef = sRef(storage, "images/" + el.name);
-      const uploadTask = uploadBytesResumable(storageRef, el, metaData);
-      uploadTask.on(
-        "state-changed",
-        (snapshot) => {
-          let progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log(progress);
-        },
-        (error) => {
-          alert("not uploaded");
-        },
-        async function downURL() {
-          const docRef = doc(db, "watches", docRefWithId.id);
-          // const docRef = doc(db, "watches", user.uid);
-
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            allUrls.push(downloadURL);
-            console.log(uploadTask.snapshot.ref);
-            let everyImg = {
-              imgUrl: [...allUrls],
-            };
-            // saveURLtoFirestore(allUrls);
-
-            updateDoc(docRef, everyImg)
-              .then((docRef) => {
-                console.log("a new image is added");
-              })
-              .catch((error) => {
-                console.log("cant add images");
-              });
-          });
-        }
-      );
-    });
-    allUrls = [];
-  }
-
-  uploadProcess();
-  watchBrand.value = "";
-  watchModel.value = "";
-  watchProdYear.value = "";
-  descOfWatch.value = "";
-
-  // url = "";
-}
 let theContainer = document.querySelector("#important-row");
 
-const querySnapshot = await getDocs(collection(db, "watches"));
+// const querySnapshot = await getDocs(collection(db, "watches"));
+// const collectionQuery = query(collection(db, "watches"));
 
-// querySnapshot.forEach((doc) => {});
+const querySnapshot = await getDocs(collectionQuery);
+if (querySnapshot.empty) {
+  const modalDialog = document.createElement("div");
+  const modalContent = document.createElement("div");
+  const modalHeader = document.createElement("div");
+  const modalBody = document.createElement("div");
+  const modalTitle = document.createElement("h5");
+  const modalBodyParagraph = document.createElement("p");
 
-setTimeout(() => {
-  const theListing = document.querySelectorAll(".col.mt-5");
-  console.log(theListing);
-}, 2000);
+  modalDialog.classList.add("modal-dialog");
+  modalContent.classList.add("modal-content");
+  modalHeader.classList.add("modal-header");
+  modalBody.classList.add("modal-body");
+  modalTitle.classList.add("modal-title");
 
-const auth = getAuth();
+  modalTitle.textContent = "Watch Sale Mk";
+  modalBodyParagraph.textContent = "There Are No Watches For Sale";
+  modalBody.append(modalBodyParagraph);
+  modalHeader.append(modalTitle);
+  modalContent.append(modalHeader, modalBody);
+  modalDialog.append(modalContent);
+  document.body.append(modalDialog);
+}
+
+
+// const auth = getAuth();
 const signUp = document.querySelector("#sign-up");
 
-const theCollection = query(collection(db, "watches"));
+// const theCollection = query(collection(db, "watches"));
 
-const makingTheListing = onSnapshot(theCollection, (snapshot) => {
+const makingTheListing = onSnapshot(collectionQuery, (snapshot) => {
   snapshot.docChanges().forEach((change) => {
     const user = auth.currentUser;
 
     if (change.type === "added") {
-      const auth = getAuth();
+      // const auth = getAuth();
       const signUp = document.querySelector("#sign-up");
       const user = auth.currentUser;
-      console.log(change.doc.data().imgUrl);
       let theUid = change.doc.id;
       theUid = theUid.replace(/ +/g, "");
-      console.log(theUid);
       let theCard = document.createElement("div");
       theCard.setAttribute("id", `${theUid}`);
       theCard.classList.add("col", "mb-5");
@@ -201,7 +97,6 @@ const makingTheListing = onSnapshot(theCollection, (snapshot) => {
       const uploadTime = document.createElement("small");
       uploadDate.classList.add("text-muted");
       uploadTime.classList.add("text-muted");
-      console.log(change.doc.data().imageName.toDate().toDateString());
       let theDate = change.doc.data().imageName.toDate().toDateString();
       let theTime = change.doc
         .data()
@@ -229,7 +124,6 @@ const makingTheListing = onSnapshot(theCollection, (snapshot) => {
         change.doc.data().brand + " " + change.doc.data().model;
       let ageOfWatch = change.doc.data().prodYear;
       let descWatch = change.doc.data().description;
-      console.log(change.doc.data().imgUrl);
 
       const srcOfImg = change.doc.data().imgUrl;
       theimgOfWatch.addEventListener("load", () => {
@@ -246,19 +140,12 @@ const makingTheListing = onSnapshot(theCollection, (snapshot) => {
         descWatch = "Нема детално објаснување за часовникот!";
       }
       theshortDescWatch.textContent = descWatch;
-      console.log(user);
 
       if (user !== null) {
-        console.log(user.uid);
         user.providerData.forEach((profile) => {
-          console.log("Sign-in provider: " + profile.providerId);
-          console.log("  Provider-specific UID: " + profile.uid);
-          console.log("  Name: " + profile.contactInfo);
-          console.log("  Email: " + profile.email);
-          console.log("  Photo URL: " + profile.photoURL);
         });
       }
-      // theBestFunc();
+
     }
     if (change.type === "modified") {
       const theUid = change.doc.id;
@@ -266,10 +153,8 @@ const makingTheListing = onSnapshot(theCollection, (snapshot) => {
       const img = theCard.querySelector(".card-img-top");
 
       img.src = change.doc.data().imgUrl;
-      console.log("Modified city: ", change.doc.id);
     }
     if (change.type === "removed") {
-      console.log("Removed city: ", change.doc.data());
     }
   });
 });
@@ -282,15 +167,9 @@ signUp.addEventListener("click", (e) => {
 });
 
 onAuthStateChanged(auth, (user) => {
-  const userAddingWatch = document.querySelector("#user-add-watch");
   if (user) {
-    userAddingWatch.style.display = "block";
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/firebase.User
     signUp.textContent = "Sign Out";
-    // ...
   } else {
-    userAddingWatch.style.display = "none";
     signUp.textContent = "Sign Up";
   }
 });
@@ -299,15 +178,9 @@ window.addEventListener("click", (e) => {
   if (e.target.textContent === "Sign Out") {
     if (confirm("Do You Want To Sign Out?") === true) {
       signOut(auth)
-        .then(() => {
-          console.log(auth.currentUser);
-          console.log("sign-oout succ");
-
-          // Sign-out successful.
-        })
+        .then(() => {})
         .catch((error) => {
-          // An error happened.
-          console.log("bad hpn");
+
         });
     }
   }

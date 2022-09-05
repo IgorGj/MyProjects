@@ -1,26 +1,13 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-app.js";
+import { db, auth } from "./baseSetup.js";
+
 import {
-  getFirestore,
   doc,
   getDoc,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
 import {
-  getAuth,
   signOut,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAmsKYsU_0LQkC2KGFxRvzNV9dcmkWiqP0",
-  authDomain: "watchsalesite-f6af0.firebaseapp.com",
-  databaseURL: "https://watchsalesite-f6af0-default-rtdb.firebaseio.com",
-  projectId: "watchsalesite-f6af0",
-  storageBucket: "watchsalesite-f6af0.appspot.com",
-  messagingSenderId: "21745374690",
-  appId: "1:21745374690:web:fa3faec6184db9f08415bb",
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 const params = new URLSearchParams(window.location.search);
 let theId = params.get("id");
@@ -77,13 +64,10 @@ if (docSnap.exists()) {
 }
 
 const signUp = document.querySelector("#sign-up");
-const auth = getAuth();
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/firebase.User
     signUp.textContent = "Sign Out";
-    // ...
   } else {
     signUp.textContent = "Sign Up";
   }
@@ -94,10 +78,7 @@ window.addEventListener("click", (e) => {
     if (confirm("Do You Want To Sign Out?") === true) {
       signOut(auth)
         .then(() => {
-          console.log(auth.currentUser);
-          console.log("sign-oout succ");
-
-          // Sign-out successful.
+          //Sign Out Successful
         })
         .catch((error) => {
           // An error happened.

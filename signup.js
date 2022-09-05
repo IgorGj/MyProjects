@@ -1,4 +1,4 @@
-import { app } from "./baseSetup.js";
+import { app,  auth } from "./baseSetup.js";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -9,11 +9,9 @@ import {
 
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
 
-const db = getFirestore(app);
-
 const googleProvider = new GoogleAuthProvider();
 const facebookProvider = new FacebookAuthProvider();
-const auth = getAuth();
+// const auth = getAuth();
 auth.useDeviceLanguage();
 const googleBtn = document.getElementById("google");
 const facebookBtn = document.getElementById("facebook");
@@ -39,7 +37,7 @@ googleBtn.addEventListener("click", () => {
   theLoadingScreen();
   signInWithPopup(auth, googleProvider)
     .then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
+
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const token = credential.accessToken;
       // The signed-in user info.
@@ -91,8 +89,7 @@ const confirmPassInput = document.createElement("input");
 const passwordRequirements = document.createElement("small");
 const passwordsNotMatching = document.createElement("small");
 const validatingEmail = document.createElement("small");
-// const fullName = document.createElement("input");
-// const contact = document.createElement("input");
+
 
 emailInput.required = true;
 emailInput.setAttribute("type", "email");
@@ -127,15 +124,6 @@ passwordRequirements.setAttribute("style", "display:none");
 passwordsNotMatching.textContent = "Your Passwords Are not Matching!";
 passwordsNotMatching.setAttribute("style", " display:none");
 
-// fullName.setAttribute("type", "text");
-// fullName.setAttribute("placeholder", "Your Full Name");
-// fullName.classList.add("form-control");
-// fullName.setAttribute("style", "display:block; margin:1rem auto; width:50%");
-
-// contact.setAttribute("type", "tel");
-// contact.setAttribute("placeholder", "Your Mobile Number");
-// contact.classList.add("form-control");
-// contact.setAttribute("style", "display:block; margin:1rem auto; width:50%");
 
 createWatchMkAcc.addEventListener("click", () => {
   createMyAccBtn.textContent = "Create My Account";
@@ -214,7 +202,7 @@ createMyAccBtn.addEventListener("click", () => {
     passInput.value === "" ||
     confirmPassInput.value === ""
   ) {
-    // emailInput.setAttribute("style", "border-color:red");
+
     emailInput.value === ""
       ? (emailInput.style.borderColor = "red")
       : (emailInput.style.borderColor = "green");
@@ -247,7 +235,6 @@ createMyAccBtn.addEventListener("click", () => {
       .then((userCredential) => {
         // Signed in
 
-        // const db = getDatabase();
         const signRow = document.getElementById("sign-in-card").parentElement;
         // Signed in
         document.getElementById("loader").style.display = "none";
@@ -268,20 +255,5 @@ createMyAccBtn.addEventListener("click", () => {
   // passInput.value = "";
   // confirmPassInput.value = "";
   // emailInput.value = "";
-  let widthChange = 1;
 
-  document.getElementById("loader").style.display = "block";
-
-  const theInterval = setInterval(() => {
-    widthChange++;
-    if (widthChange === 100 || widthChange >= 100) {
-      widthChange = 100;
-    }
-
-    signRow.innerHTML = `<div id="outer-progress" style="display:inline-block; width:100%; height:30px; background-color:gray; text-align:center"><div id="inner-progress" style="display:inline-block;height:100%;background-color: red; width:${widthChange}%; "></div><h2>Creating Your Account</h2></div>`;
-  }, 30.333333);
-  setTimeout(() => {
-    clearInterval(theInterval);
-    window.location.href = "./index.html";
-  }, 3000);
 });

@@ -1,6 +1,5 @@
-import { app } from "./baseSetup.js";
+import { app, auth } from "./baseSetup.js";
 import {
-  getAuth,
   GoogleAuthProvider,
   FacebookAuthProvider,
   signInWithEmailAndPassword,
@@ -11,7 +10,7 @@ import {
 
 const googleProvider = new GoogleAuthProvider();
 const facebookProvider = new FacebookAuthProvider();
-const auth = getAuth(app);
+// const auth = getAuth(app);
 
 const googleBtn = document.getElementById("google");
 const facebookBtn = document.getElementById("facebook");
@@ -38,6 +37,7 @@ const theLoadingScreen = () => {
 
 googleBtn.addEventListener("click", () => {
   theLoadingScreen();
+  document.getElementById("loader").style.display = "block";
   signInWithPopup(auth, googleProvider)
     .then((result) => {
       // This gives you a Google Access Token. You can use it to access the Google API.
@@ -45,6 +45,8 @@ googleBtn.addEventListener("click", () => {
       const token = credential.accessToken;
       // The signed-in user info.
       const user = result.user;
+      document.getElementById("loader").style.display = "none";
+      window.location.href = "./index.html";
       // ...
     })
     .catch((error) => {
@@ -61,6 +63,7 @@ googleBtn.addEventListener("click", () => {
 
 facebookBtn.addEventListener("click", () => {
   theLoadingScreen();
+  document.getElementById("loader").style.display = "block";
 
   signInWithPopup(auth, facebookProvider)
     .then((result) => {
@@ -70,7 +73,8 @@ facebookBtn.addEventListener("click", () => {
       // This gives you a Facebook Access Token. You can use it to access the Facebook API.
       const credential = FacebookAuthProvider.credentialFromResult(result);
       const accessToken = credential.accessToken;
-
+      document.getElementById("loader").style.display = "none";
+      window.location.href = "./index.html";
       // ...
     })
     .catch((error) => {
