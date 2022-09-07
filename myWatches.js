@@ -20,6 +20,83 @@ import {
   getDownloadURL,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-storage.js";
 
+let allUrls = [];
+async function saveURLtoFirestore(
+  _watchBrand,
+  _watchModel,
+  _watchProdYear,
+  _descOfWatch,
+  _watchPrize,
+  _files
+) {
+  // let imagName = new Date().toGMTString();
+  let imagName = new Date();
+  // imagName = imagName.replace(/ +/g, "");
+
+  // const watchBrand = document.getElementById("watch-brand");
+  // const watchModel = document.getElementById("watch-model");
+  // const watchProdYear = document.getElementById("watch-age");
+  // const descOfWatch = document.getElementById("desc-of-watch");
+
+  const docRefWithId = await addDoc(collection(db, "watches"), {
+    userId: auth.currentUser.uid,
+    imageName: imagName,
+    imgUrl: [],
+    brand: _watchBrand.value,
+    model: _watchModel.value,
+    prodYear: _watchProdYear.value,
+    description: _descOfWatch.value,
+    prize: _watchPrize.value,
+  });
+
+  async function uploadProcess() {
+    let imgtoUpload = [..._files];
+    [..._files].forEach((el) => {
+      let imgName = new Date();
+      // set metadata so if the user doesn't chose an image he can't make a listing.
+      const metaData = {
+        contentType: el.type,
+      };
+      const storageRef = sRef(storage, "images/" + el.name);
+      const uploadTask = uploadBytesResumable(storageRef, el, metaData);
+      uploadTask.on(
+        "state-changed",
+        (snapshot) => {
+          let progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        },
+        (error) => {
+          alert("not uploaded");
+        },
+        async function downURL() {
+          const docRef = doc(db, "watches", docRefWithId.id);
+          // const docRef = doc(db, "watches", user.uid);
+
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            allUrls.push(downloadURL);
+            let everyImg = {
+              imgUrl: [...allUrls],
+            };
+            // saveURLtoFirestore(allUrls);
+
+            updateDoc(docRef, everyImg)
+              .then((docRef) => {})
+              .catch((error) => {});
+          });
+        }
+      );
+    });
+    allUrls = [];
+  }
+
+  uploadProcess();
+  _watchBrand.value = "";
+  _watchModel.value = "";
+  _watchProdYear.value = "";
+  _watchPrize.value = "";
+  _descOfWatch.value = "";
+}
+
 let creatingModal = () => {
   const modalDialog = document.createElement("div");
   const modalContent = document.createElement("div");
@@ -39,13 +116,10 @@ let creatingModal = () => {
   const watchBrand = document.createElement("input");
   const watchModel = document.createElement("input");
   const watchProdYear = document.createElement("input");
+  const watchPrize = document.createElement("input");
   const inputWatchImage = document.createElement("input");
   const descOfWatch = document.createElement("textarea");
 
-  // const watchBrand = document.getElementById("watch-brand");
-  // const watchModel = document.getElementById("watch-model");
-  // const watchProdYear = document.getElementById("watch-age");
-  // const descOfWatch = document.getElementById("desc-of-watch");
   watchBrand.classList.add("form-control", "form-control-lg", "mb-5");
   watchBrand.setAttribute("type", "text");
   watchBrand.setAttribute("placeholder", "Бренд на часовникот");
@@ -58,8 +132,13 @@ let creatingModal = () => {
   watchProdYear.setAttribute("type", "number");
   watchProdYear.setAttribute("placeholder", "Година на производство");
 
+  watchPrize.classList.add("form-control", "form-control-lg", "mb-5");
+  watchPrize.setAttribute("type", "number");
+  watchPrize.setAttribute("placeholder", "Цена на часовникот");
+
   inputWatchImage.classList.add("form-control-file");
   inputWatchImage.setAttribute("type", "file");
+  inputWatchImage.setAttribute("multiple", "");
 
   descOfWatch.classList.add("form-control", "mb-5");
   descOfWatch.setAttribute("rows", "3");
@@ -78,6 +157,7 @@ let creatingModal = () => {
     watchBrand,
     watchModel,
     watchProdYear,
+    watchPrize,
     descOfWatch,
     inputWatchImage
   );
@@ -91,107 +171,44 @@ let creatingModal = () => {
   let reader = new FileReader();
   inputWatchImage.onchange = (e) => {
     files = e.target.files;
-    console.log([...e.target.files]);
     // let extention = GetFileExt(files[0]);
     // let theName = GetFileName(files[0]);
     reader.readAsDataURL(files[0]);
   };
 
-  let allUrls = [];
-  async function saveURLtoFirestore() {
-    // let imagName = new Date().toGMTString();
-    let imagName = new Date();
-    // imagName = imagName.replace(/ +/g, "");
-    console.log(imagName);
-
-    const watchBrand = document.getElementById("watch-brand");
-    const watchModel = document.getElementById("watch-model");
-    const watchProdYear = document.getElementById("watch-age");
-    const descOfWatch = document.getElementById("desc-of-watch");
-
-    const docRefWithId = await addDoc(collection(db, "watches"), {
-      userId: auth.currentUser.uid,
-      imageName: imagName,
-      imgUrl: [],
-      brand: watchBrand.value,
-      model: watchModel.value,
-      prodYear: watchProdYear.value,
-      description: descOfWatch.value,
-    });
-
-    async function uploadProcess() {
-      let imgtoUpload = [...files];
-      console.log([...files]);
-      [...files].forEach((el) => {
-        let imgName = new Date();
-        // set metadata so if the user doesn't chose an image he can't make a listing.
-        const metaData = {
-          contentType: el.type,
-        };
-        const storageRef = sRef(storage, "images/" + el.name);
-        const uploadTask = uploadBytesResumable(storageRef, el, metaData);
-        uploadTask.on(
-          "state-changed",
-          (snapshot) => {
-            let progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log(progress);
-          },
-          (error) => {
-            alert("not uploaded");
-          },
-          async function downURL() {
-            const docRef = doc(db, "watches", docRefWithId.id);
-            // const docRef = doc(db, "watches", user.uid);
-
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              allUrls.push(downloadURL);
-              console.log(uploadTask.snapshot.ref);
-              let everyImg = {
-                imgUrl: [...allUrls],
-              };
-              // saveURLtoFirestore(allUrls);
-
-              updateDoc(docRef, everyImg)
-                .then((docRef) => {
-                  console.log("a new image is added");
-                })
-                .catch((error) => {
-                  console.log("cant add images");
-                });
-            });
-          }
-        );
-      });
-      allUrls = [];
-    }
-
-    uploadProcess();
-    watchBrand.value = "";
-    watchModel.value = "";
-    watchProdYear.value = "";
-    descOfWatch.value = "";
-  }
-  addTheWatchBtn.addEventListener("click", saveURLtoFirestore);
   addTheWatchBtn.addEventListener("click", () => {
+    saveURLtoFirestore(
+      watchBrand,
+      watchModel,
+      watchProdYear,
+      descOfWatch,
+      watchPrize,
+      files
+    );
     modalDialog.remove();
   });
 };
 
 let creatingWatch = (parametar) => {
   if (!parametar.doc.id) {
-    console.log("njama parametar.doc.id");
   }
   let theUid = parametar.doc.id;
   theUid = theUid.replace(/ +/g, "");
-  console.log(theUid);
   let theCard = document.createElement("div");
   theCard.setAttribute("style", "  position: relative;");
   theCard.setAttribute("id", `${theUid}`);
   theCard.classList.add("col", "mb-5");
   let thecardForWatch = document.createElement("div");
   thecardForWatch.classList.add("card", "w-100", "h-100");
+
+  let thePrizeOfWatch = document.createElement("i");
+  thePrizeOfWatch.style.color = "red";
+  thePrizeOfWatch.style.fontSize = "1.5rem";
+
+  thePrizeOfWatch.textContent = `${parametar.doc.data().prize} ден.`;
+
   let theimgOfWatch = document.createElement("img");
+
   theimgOfWatch.classList.add("card-img-top");
 
   const loaderParent = document.createElement("div");
@@ -235,7 +252,6 @@ let creatingWatch = (parametar) => {
   const uploadTime = document.createElement("small");
   uploadDate.classList.add("text-muted");
   uploadTime.classList.add("text-muted");
-  console.log(parametar.doc.data().imageName.toDate().toDateString());
   let theDate = parametar.doc.data().imageName.toDate().toDateString();
   let theTime = parametar.doc
     .data()
@@ -245,7 +261,13 @@ let creatingWatch = (parametar) => {
   uploadDate.textContent = theDate;
   uploadTime.textContent = theTime;
   const theBrake = document.createElement("br");
-  theCardFooter.append(theLink, uploadDate, theBrake, uploadTime);
+  theCardFooter.append(
+    thePrizeOfWatch,
+    theLink,
+    uploadDate,
+    theBrake,
+    uploadTime
+  );
   thedescriptionOfWatch.append(
     thenameOfWatch,
     theageOfWatch,
@@ -288,114 +310,39 @@ let creatingWatch = (parametar) => {
 };
 
 const imgOfWatch = document.getElementById("img-of-watch");
-let files = [];
+let filesSecond = [];
 let reader = new FileReader();
 imgOfWatch.onchange = (e) => {
-  files = e.target.files;
-  console.log([...e.target.files]);
+  filesSecond = e.target.files;
   // let extention = GetFileExt(files[0]);
   // let theName = GetFileName(files[0]);
-  reader.readAsDataURL(files[0]);
+  reader.readAsDataURL(filesSecond[0]);
 };
 
 let theContainer = document.querySelector("#important-row");
 
 const addingWatches = document.getElementById("add-watch");
 addingWatches.addEventListener("click", () => {
-  async function saveURLtoFirestore() {
-    // let imagName = new Date().toGMTString();
-    let imagName = new Date();
-    // imagName = imagName.replace(/ +/g, "");
-
-    const watchBrand = document.getElementById("watch-brand");
-    const watchModel = document.getElementById("watch-model");
-    const watchProdYear = document.getElementById("watch-age");
-    const descOfWatch = document.getElementById("desc-of-watch");
-
-    // const auth = getAuth();
-    // const user = auth.currentUser;
-    // await setDoc(doc(db, "watches", imagName), {
-    //   brand: watchBrand.value,
-    //   model: watchModel.value,
-    //   imgUrl: [],
-    //   prodYear: watchProdYear.value,
-    //   description: descOfWatch.value,
-    //   imageName: new Date(),
-    // });
-    const docRefWithId = await addDoc(collection(db, "watches"), {
-      userId: auth.currentUser.uid,
-      imageName: imagName,
-      imgUrl: [],
-      brand: watchBrand.value,
-      model: watchModel.value,
-      prodYear: watchProdYear.value,
-      description: descOfWatch.value,
-    });
-
-    async function uploadProcess() {
-      let imgtoUpload = [...files];
-      console.log([...files]);
-      [...files].forEach((el) => {
-        let imgName = new Date();
-        // set metadata so if the user doesn't chose an image he can't make a listing.
-        const metaData = {
-          contentType: el.type,
-        };
-        const storageRef = sRef(storage, "images/" + el.name);
-        const uploadTask = uploadBytesResumable(storageRef, el, metaData);
-        uploadTask.on(
-          "state-changed",
-          (snapshot) => {
-            let progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log(progress);
-          },
-          (error) => {
-            alert("not uploaded");
-          },
-          async function downURL() {
-            const docRef = doc(db, "watches", docRefWithId.id);
-            // const docRef = doc(db, "watches", user.uid);
-
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              allUrls.push(downloadURL);
-              console.log(uploadTask.snapshot.ref);
-              let everyImg = {
-                imgUrl: [...allUrls],
-              };
-              // saveURLtoFirestore(allUrls);
-
-              updateDoc(docRef, everyImg)
-                .then((docRef) => {
-                  console.log("a new image is added");
-                })
-                .catch((error) => {
-                  console.log("cant add images");
-                });
-            });
-          }
-        );
-      });
-      allUrls = [];
-    }
-
-    uploadProcess();
-    watchBrand.value = "";
-    watchModel.value = "";
-    watchProdYear.value = "";
-    descOfWatch.value = "";
-
-    // url = "";
-  }
-  saveURLtoFirestore();
+  const watchBrand = document.getElementById("watch-brand");
+  const watchModel = document.getElementById("watch-model");
+  const watchProdYear = document.getElementById("watch-age");
+  const descOfWatch = document.getElementById("desc-of-watch");
+  const watchPrize = document.getElementById("watch-prize");
+  saveURLtoFirestore(
+    watchBrand,
+    watchModel,
+    watchProdYear,
+    descOfWatch,
+    watchPrize,
+    filesSecond
+  );
 });
-let allUrls = [];
+// let allUrls = [];
 
 // async function saveURLtoFirestore(url) {
 //   // let imagName = new Date().toGMTString();
 //   let imagName = new Date();
 //   // imagName = imagName.replace(/ +/g, "");
-//   console.log(imagName);
 
 //   const watchBrand = document.getElementById("watch-brand");
 //   const watchModel = document.getElementById("watch-model");
@@ -424,7 +371,6 @@ let allUrls = [];
 
 //   async function uploadProcess() {
 //     let imgtoUpload = [...files];
-//     console.log([...files]);
 //     [...files].forEach((el) => {
 //       let imgName = new Date();
 //       // set metadata so if the user doesn't chose an image he can't make a listing.
@@ -438,7 +384,6 @@ let allUrls = [];
 //         (snapshot) => {
 //           let progress =
 //             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-//           console.log(progress);
 //         },
 //         (error) => {
 //           alert("not uploaded");
@@ -449,7 +394,6 @@ let allUrls = [];
 
 //           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
 //             allUrls.push(downloadURL);
-//             console.log(uploadTask.snapshot.ref);
 //             let everyImg = {
 //               imgUrl: [...allUrls],
 //             };
@@ -457,10 +401,8 @@ let allUrls = [];
 
 //             updateDoc(docRef, everyImg)
 //               .then((docRef) => {
-//                 console.log("a new image is added");
 //               })
 //               .catch((error) => {
-//                 console.log("cant add images");
 //               });
 //           });
 //         }
@@ -483,18 +425,20 @@ let allUrls = [];
 const makingTheListing = onSnapshot(collectionQuery, (snapshot) => {
   if (!auth.currentUser) {
     const theModalInner = document.getElementById("myModal");
-    const theModal = document.querySelector(".my-modal");
-    const closingModal = document.querySelector(".close");
+    // const theModal = document.querySelector(".my-modal");
+    // const closingModal = document.querySelector(".close");
 
     theModalInner.style.display = "block";
 
-    closingModal.addEventListener("click", () => {
-      theModalInner.style.display = "none";
-    });
+     
 
-    theModal.addEventListener("click", () => {
-      theModalInner.style.display = "none";
-    });
+    // closingModal.addEventListener("click", () => {
+    //   theModalInner.style.display = "none";
+    // });
+
+    // theModal.addEventListener("click", () => {
+    //   theModalInner.style.display = "none";
+    // });
     return;
   }
   snapshot.docChanges().forEach(async (change) => {
@@ -503,7 +447,8 @@ const makingTheListing = onSnapshot(collectionQuery, (snapshot) => {
       change.type === "added"
     ) {
       creatingWatch(change);
-      console.log(document.querySelector(".modal-dialog"));
+      const userAddWatchBtn = document.querySelector("#user-add-watch");
+      userAddWatchBtn.style.display = "block";
     }
 
     if (change.type === "modified") {
@@ -512,21 +457,19 @@ const makingTheListing = onSnapshot(collectionQuery, (snapshot) => {
       const img = theCard.querySelector(".card-img-top");
 
       img.src = change.doc.data().imgUrl;
-      console.log("Modified city: ", change.doc.id);
     }
 
     if (change.type === "removed") {
-      console.log("Removed city: ", change.doc.data());
       const q = query(
         collection(db, "watches"),
         where("userId", "==", `${auth.currentUser.uid}`)
       );
-      console.log(q);
       const querySnapshot = await getDocs(q);
-      console.log(querySnapshot);
       if (querySnapshot.empty) {
         creatingModal();
-        document.querySelector("#user-add-watch").parentElement.remove();
+        const userAddWatchBtn = document.querySelector("#user-add-watch");
+
+        userAddWatchBtn.style.display = "none";
       }
     }
   });
@@ -542,9 +485,7 @@ try {
       num++;
     }
   });
-} catch (e) {
-  console.log(e);
-}
+} catch (e) {}
 
 const signUp = document.querySelector("#sign-up");
 
@@ -557,10 +498,11 @@ onAuthStateChanged(auth, async (user) => {
       where("userId", "==", `${user.uid}`)
     );
     const querySnapshot = await getDocs(q);
-
     if (querySnapshot.empty) {
       creatingModal();
-      document.querySelector("#user-add-watch").parentElement.remove();
+      document.querySelector("#user-add-watch").style.display = "none";
+
+      // document.querySelector("#user-add-watch").parentElement.remove();
     }
   } else {
     signUp.textContent = "Sign Up";
@@ -575,10 +517,9 @@ window.addEventListener("click", (e) => {
       signOut(auth)
         .then(() => {
           // Sign-out successful.
+          window.location.href = "./index.html";
         })
-        .catch((error) => {
-          console.log("bad hpn");
-        });
+        .catch((error) => {});
     } else {
       return;
     }

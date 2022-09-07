@@ -50,7 +50,7 @@
       </div>
     </nav>
     <!-- Button trigger modal -->
-    <div class="d-flex justify-content-center mt-5">
+    <div class="d-flex justify-content-center mt-5" id="div-for-add-btn">
       <button
         type="button"
         class="btn btn-primary"
@@ -106,6 +106,12 @@
                   type="number"
                   placeholder="Година на производство"
                 />
+                <input
+                  id="watch-prize"
+                  class="form-control form-control-lg mb-5"
+                  type="number"
+                  placeholder="Цена на часовникот"
+                />
 
                 <textarea
                   id="desc-of-watch"
@@ -153,13 +159,17 @@
     <div id="myModal" class="my-modal">
       <!-- Modal content -->
       <div class="my-modal-content text-center">
-        <span class="close">&times;</span>
         <p>You are not logged in or your don't have an account</p>
         <a href="./signIn.html" class="btn btn-info d-block w-25 mx-auto mt-2"
           >Log In</a
         >
-        <a href="./signIn.html" class="btn btn-info w-25 mx-auto mt-2"
+        <a href="./signup.html" class="btn btn-info d-block w-25 mx-auto mt-2"
           >Sign Up</a
+        >
+        <a
+          href="./index.html"
+          class="btn btn-sm btn-warning d-block w-25 ml-auto mt-2"
+          >Home</a
         >
       </div>
     </div>

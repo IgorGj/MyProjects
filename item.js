@@ -1,17 +1,10 @@
-import { app, db, auth, collectionQuery } from "./baseSetup.js";
+import { auth, collectionQuery } from "./baseSetup.js";
 import {
-  getFirestore,
-  collection,
-  query,
-  doc,
   onSnapshot,
-  addDoc,
   getDocs,
-  updateDoc,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
 
 import {
-  getAuth,
   signOut,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-auth.js";
@@ -47,7 +40,6 @@ if (querySnapshot.empty) {
   document.body.append(modalDialog);
 }
 
-
 // const auth = getAuth();
 const signUp = document.querySelector("#sign-up");
 
@@ -74,6 +66,14 @@ const makingTheListing = onSnapshot(collectionQuery, (snapshot) => {
       theLoader.setAttribute("id", "loader");
       const loaderParent = document.createElement("div");
 
+      let thePrizeOfWatch = document.createElement("i");
+      thePrizeOfWatch.style.color = "red";
+      thePrizeOfWatch.style.fontSize = "1.5rem";
+
+      thePrizeOfWatch.textContent = `${change.doc.data().prize} ден.`;
+      if (change.doc.data().prize === "") {
+        thePrizeOfWatch.textContent = `По договор.`;
+      }
       loaderParent.setAttribute(
         "style",
         "position:absolute;top:50%; left:50%; transform: translate(-50%,-50%);"
@@ -106,7 +106,13 @@ const makingTheListing = onSnapshot(collectionQuery, (snapshot) => {
       uploadDate.textContent = theDate;
       uploadTime.textContent = theTime;
       const theBrake = document.createElement("br");
-      theCardFooter.append(theLink, uploadDate, theBrake, uploadTime);
+      theCardFooter.append(
+        thePrizeOfWatch,
+        theLink,
+        uploadDate,
+        theBrake,
+        uploadTime
+      );
       thedescriptionOfWatch.append(
         thenameOfWatch,
         theageOfWatch,
@@ -142,10 +148,8 @@ const makingTheListing = onSnapshot(collectionQuery, (snapshot) => {
       theshortDescWatch.textContent = descWatch;
 
       if (user !== null) {
-        user.providerData.forEach((profile) => {
-        });
+        user.providerData.forEach((profile) => {});
       }
-
     }
     if (change.type === "modified") {
       const theUid = change.doc.id;
@@ -179,9 +183,7 @@ window.addEventListener("click", (e) => {
     if (confirm("Do You Want To Sign Out?") === true) {
       signOut(auth)
         .then(() => {})
-        .catch((error) => {
-
-        });
+        .catch((error) => {});
     }
   }
   return;

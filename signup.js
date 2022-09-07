@@ -21,71 +21,248 @@ const googleBtn = document.getElementById("google");
 const facebookBtn = document.getElementById("facebook");
 const createWatchMkAcc = document.getElementById("watch-mk-acc");
 const signInCard = document.getElementById("sign-in-card");
-const theLoadingScreen = () => {
-  document.getElementById("loader").style.display = "block";
-  let widthChange = 1;
-  const theInterval = setInterval(() => {
-    widthChange++;
-    if (widthChange === 100 || widthChange >= 100) {
-      widthChange = 100;
-    }
 
-    signRow.innerHTML = `<div id="outer-progress" style="display:inline-block; width:100%; height:30px; background-color:gray; text-align:center"><div id="inner-progress" style="display:inline-block;height:100%;background-color: red; width:${widthChange}%; "></div><h2>Creating Your Account</h2></div>`;
-  }, 30.333333);
-  setTimeout(() => {
-    clearInterval(theInterval);
-    window.location.href = "./index.html";
-  }, 3000);
+let onlyOnce = true;
+
+let widthChange = 1;
+const theInterval = () => {
+  widthChange++;
+  if (widthChange === 100 || widthChange >= 100) {
+    widthChange = 100;
+  }
+
+  signRow.innerHTML = `<div id="outer-progress" style="display:inline-block; width:100%; height:30px; background-color:gray; text-align:center"><div id="inner-progress" style="display:inline-block;height:100%;background-color: red; width:${widthChange}%; "></div><h2>Creating Your Account</h2></div>`;
 };
-googleBtn.addEventListener("click", () => {
-  theLoadingScreen();
-  signInWithPopup(auth, googleProvider)
-    .then((result) => {
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      // The signed-in user info.
-      const user = result.user;
 
-      // ...
-    })
-    .catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.customData.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
-    });
+googleBtn.addEventListener("click", () => {
+  if (formDiv) {
+    formDiv.style.display = "none";
+  }
+
+  const h5 = document.querySelector("#hfive-for-acc");
+  h5.style.display = "none";
+  const watchSaleSiteAccBtn = document.querySelector("#watch-mk-acc");
+  watchSaleSiteAccBtn.style.display = "none";
+
+  const fullNameInput = document.createElement("input");
+  const contactInfoInput = document.createElement("input");
+  const signupWithGoogle = document.createElement("button");
+  fullNameInput.setAttribute("placeholder", "Enter Your Full Name");
+  fullNameInput.setAttribute("type", "text");
+  fullNameInput.setAttribute(
+    "style",
+    "display:block; margin:1rem auto; width:50%"
+  );
+  fullNameInput.classList.add("from-control");
+
+  contactInfoInput.setAttribute("placeholder", "Enter Your Contact Number");
+  contactInfoInput.setAttribute("type", "number");
+
+  contactInfoInput.setAttribute(
+    "style",
+    "display:block; margin:1rem auto; width:50%"
+  );
+  contactInfoInput.classList.add("from-control");
+
+  signupWithGoogle.textContent = "Sign Up With Google";
+  signupWithGoogle.classList.add("btn", "btn-info");
+
+  if (onlyOnce) {
+    signInCard.append(fullNameInput, contactInfoInput, signupWithGoogle);
+  }
+  onlyOnce = false;
+
+  signupWithGoogle.addEventListener("click", (e) => {
+    if (contactInfoInput.value === "" || fullNameInput.value === "") {
+      const required = document.createElement("small");
+      required.style.color = "red";
+      required.innerHTML =
+        "Enter Your Full Name And Contact Info <br> So Peope Know Who Posted The Watch";
+
+      fullNameInput.style.borderColor = "red";
+      contactInfoInput.style.borderColor = "red";
+      signInCard.insertBefore(required, contactInfoInput);
+      return;
+    } else if (contactInfoInput.value !== "" && fullNameInput.value !== "") {
+      document.getElementById("loader").style.display = "block";
+
+      setInterval(theInterval, 30.333333);
+      signInWithPopup(auth, googleProvider)
+        .then((result) => {
+          // The signed-in user info.
+          const user = result.user;
+          clearInterval(theInterval);
+          document.getElementById("loader").style.display = "none";
+
+          // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const accessToken = credential.accessToken;
+          console.log(user.email);
+          let user_info = {
+            id: user.uid,
+            email: user.email,
+            fullName: fullNameInput.value,
+            contactNum: contactInfoInput.value,
+          };
+          set(ref(database, "users/" + user_info.id), {
+            fullName: user_info.fullName,
+            email: user_info.email,
+            id: user_info.id,
+            contactNum: user_info.contactNum,
+          });
+          console.log(auth.currentUser);
+          // window.location.href = "./index.html";
+          // ...
+        })
+        .catch((error) => {
+          // Handle Errors here.
+          //     // Handle Errors here.
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          //     // // The email of the user's account used.
+          const email = auth.currentUser.email;
+          //     // The AuthCredential type that was used.
+          const credential = GoogleAuthProvider.credentialFromError(error);
+          //     // ...
+        });
+    }
+    console.log(contactInfoInput.value);
+  });
+
+  // theLoadingScreen();
+  // signInWithPopup(auth, googleProvider)
+  //   .then((result) => {
+  //     const credential = GoogleAuthProvider.credentialFromResult(result);
+  //     const token = credential.accessToken;
+  //     // The signed-in user info.
+  //     const user = result.user;
+  //     console.log(user);
+  //     // clearInterval(theInterval);
+  //     // window.location.href = "./index.html";
+  //     // ...
+  //   })
+  //   .catch((error) => {
+  //     // Handle Errors here.
+  //     // const errorCode = error.code;
+  //     // const errorMessage = error.message;
+  //     // // The email of the user's account used.
+  //     // const email = error.customData.email;
+  //     // The AuthCredential type that was used.
+  //     const credential = GoogleAuthProvider.credentialFromError(error);
+  //     // ...
+  //   });
 });
 facebookBtn.addEventListener("click", () => {
-  theLoadingScreen();
+  // theLoadingScreen();
 
-  signInWithPopup(auth, facebookProvider)
-    .then((result) => {
-      // The signed-in user info.
-      const user = result.user;
+  const fullNameInput = document.createElement("input");
+  const contactInfoInput = document.createElement("input");
+  const signUpWithFaceBookBtn = document.createElement("button");
 
-      // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-      const credential = FacebookAuthProvider.credentialFromResult(result);
-      const accessToken = credential.accessToken;
+  fullNameInput.setAttribute("placeholder", "Enter Your Full Name");
+  fullNameInput.setAttribute("type", "text");
+  fullNameInput.setAttribute(
+    "style",
+    "display:block; margin:1rem auto; width:50%"
+  );
+  fullNameInput.classList.add("from-control");
 
-      // ...
-    })
-    .catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.customData.email;
-      // The AuthCredential type that was used.
-      const credential = FacebookAuthProvider.credentialFromError(error);
+  contactInfoInput.setAttribute("placeholder", "Enter Your Contact Number");
+  contactInfoInput.setAttribute("type", "number");
 
-      // ...
-    });
+  contactInfoInput.setAttribute(
+    "style",
+    "display:block; margin:1rem auto; width:50%"
+  );
+  contactInfoInput.classList.add("from-control");
+
+  signUpWithFaceBookBtn.textContent = "Sign Up With Facebook";
+  signUpWithFaceBookBtn.classList.add("btn", "btn-info");
+
+  const h5 = document.querySelector("#hfive-for-acc");
+  h5.style.display = "none";
+  const watchSaleSiteAccBtn = document.querySelector("#watch-mk-acc");
+  watchSaleSiteAccBtn.style.display = "none";
+
+  signUpWithFaceBookBtn.addEventListener("click", (e) => {
+    document.getElementById("loader").style.display = "block";
+    setInterval(theInterval, 30.333333);
+    signInWithPopup(auth, facebookProvider)
+      .then((result) => {
+        // The signed-in user info.
+        clearInterval(theInterval);
+        document.getElementById("loader").style.display = "none";
+        const user = result.user;
+        // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+        const credential = FacebookAuthProvider.credentialFromResult(result);
+        const accessToken = credential.accessToken;
+        let user_info = {
+          id: userUid,
+          email: emailInput.value,
+          fullName: fullNameInput.value,
+          contactNum: contactInfoInput.value,
+        };
+        set(ref(database, "users/" + user_info.id), {
+          fullName: user_info.fullName,
+          email: user_info.email,
+          id: userUid,
+          contactNum: user_info.contactInfoInput,
+        });
+        // ...
+
+        window.location.href = "./index.html";
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = FacebookAuthProvider.credentialFromError(error);
+        // ...
+      });
+  });
+
+  signInCard.append(fullNameInput, contactInfoInput, signUpWithFaceBookBtn);
+  // signInWithPopup(auth, facebookProvider)
+  //   .then((result) => {
+  //     // The signed-in user info.
+  //     const user = result.user;
+
+  //     // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+  //     const credential = FacebookAuthProvider.credentialFromResult(result);
+  //     const accessToken = credential.accessToken;
+  //     let user_info = {
+  //       id: userUid,
+  //       email: emailInput.value,
+  //       fullName: fullNameInput.value,
+  //       contactNum: numberInput.value,
+  //     };
+
+  //     set(ref(database, "users/" + user_info.id), {
+  //       fullName: user_info.fullName,
+  //       email: user_info.email,
+  //       id: userUid,
+  //       contactNum: user_info.contactNum,
+  //     });
+
+  //     // ...
+  //   })
+  //   .catch((error) => {
+  //     // Handle Errors here.
+  //     const errorCode = error.code;
+  //     const errorMessage = error.message;
+  //     // The email of the user's account used.
+  //     const email = error.customData.email;
+  //     // The AuthCredential type that was used.
+  //     const credential = FacebookAuthProvider.credentialFromError(error);
+
+  //     // ...
+  //   });
 });
 const createMyAccBtn = document.createElement("button");
+const formDiv = document.createElement("div");
 const emailInput = document.createElement("input");
 const passInput = document.createElement("input");
 const confirmPassInput = document.createElement("input");
@@ -94,6 +271,8 @@ const numberInput = document.createElement("input");
 const passwordRequirements = document.createElement("small");
 const passwordsNotMatching = document.createElement("small");
 const validatingEmail = document.createElement("small");
+
+formDiv.setAttribute("id", "div-for-form");
 
 emailInput.required = true;
 emailInput.setAttribute("type", "email");
@@ -147,7 +326,7 @@ createWatchMkAcc.addEventListener("click", () => {
   createMyAccBtn.textContent = "Create My Account";
   createMyAccBtn.classList.add("btn", "btn-sm", "btn-info");
 
-  signInCard.append(
+  formDiv.append(
     fullNameInput,
     numberInput,
     emailInput,
@@ -158,6 +337,7 @@ createWatchMkAcc.addEventListener("click", () => {
     passwordsNotMatching,
     createMyAccBtn
   );
+  signInCard.append(formDiv);
 });
 
 const validateEmail = (email) => {
