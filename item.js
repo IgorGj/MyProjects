@@ -19,6 +19,8 @@ let theContainer = document.querySelector("#important-row");
 
 // const querySnapshot = await getDocs(collection(db, "watches"));
 // const collectionQuery = query(collection(db, "watches"));
+const theFilter = document.getElementById("the-filter");
+
 
 const querySnapshot = await getDocs(collectionQuery);
 if (querySnapshot.empty) {
@@ -41,7 +43,10 @@ if (querySnapshot.empty) {
   modalHeader.append(modalTitle);
   modalContent.append(modalHeader, modalBody);
   modalDialog.append(modalContent);
+
   document.body.append(modalDialog);
+} else {
+  theFilter.style.display = "flex";
 }
 
 // const auth = getAuth();
@@ -213,7 +218,6 @@ const creatingPostWithFilter = (_somecollection) => {
   });
 };
 const searchInfo = document.getElementById("search-info");
-searchInfo.style.display = "none";
 let searchByBrand = document.getElementById("search-by-make");
 searchByBrand.addEventListener("focus", () => {
   searchInfo.style.display = "flex ";
