@@ -18,6 +18,7 @@ import {
   ref as sRef,
   uploadBytesResumable,
   getDownloadURL,
+  deleteObject,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-storage.js";
 
 let allUrls = [];
@@ -27,7 +28,8 @@ async function saveURLtoFirestore(
   _watchProdYear,
   _descOfWatch,
   _watchPrize,
-  _files
+  _files,
+  _someName
 ) {
   // let imagName = new Date().toGMTString();
   let imagName = new Date();
@@ -42,11 +44,13 @@ async function saveURLtoFirestore(
     userId: auth.currentUser.uid,
     imageName: imagName,
     imgUrl: [],
-    brand: _watchBrand.value,
+    brand: _watchBrand.value.toLowerCase(),
     model: _watchModel.value,
     prodYear: _watchProdYear.value,
     description: _descOfWatch.value,
     prize: _watchPrize.value,
+    someName: _someName,
+    howManyViews: null,
   });
 
   async function uploadProcess() {
@@ -168,9 +172,18 @@ let creatingModal = () => {
   modalDialog.append(modalContent);
   document.body.append(modalDialog);
   let files = [];
+  let namingOfImages = [];
   let reader = new FileReader();
   inputWatchImage.onchange = (e) => {
     files = e.target.files;
+    console.log(files);
+    let namesOfImages = Object.values(files);
+    console.log(namesOfImages);
+    namesOfImages.forEach((el) => {
+      namingOfImages.push(el.name);
+    });
+    console.log(namingOfImages);
+
     // let extention = GetFileExt(files[0]);
     // let theName = GetFileName(files[0]);
     reader.readAsDataURL(files[0]);
@@ -183,7 +196,8 @@ let creatingModal = () => {
       watchProdYear,
       descOfWatch,
       watchPrize,
-      files
+      files,
+      namingOfImages
     );
     modalDialog.remove();
   });
@@ -204,8 +218,19 @@ let creatingWatch = (parametar) => {
   let thePrizeOfWatch = document.createElement("i");
   thePrizeOfWatch.style.color = "red";
   thePrizeOfWatch.style.fontSize = "1.5rem";
+  parametar.doc.data().prize === ""
+    ? (thePrizeOfWatch.textContent = ` По договор.`)
+    : (thePrizeOfWatch.textContent = `${parametar.doc.data().prize} ден.`);
 
-  thePrizeOfWatch.textContent = `${parametar.doc.data().prize} ден.`;
+  let viewsOfThePost = document.createElement("p");
+  viewsOfThePost.classList.add("text-info", "font-weight-bold", "font-italic");
+
+  viewsOfThePost.innerHTML = `Постот има ${
+    parametar.doc.data().howManyViews
+  } прегледи.`;
+  if (parametar.doc.data().howManyViews === null) {
+    viewsOfThePost.innerHTML = `Постот нема прегледи.`;
+  }
 
   let theimgOfWatch = document.createElement("img");
 
@@ -237,6 +262,19 @@ let creatingWatch = (parametar) => {
   );
 
   deleteBtn.addEventListener("click", () => {
+    console.log(parametar.doc.data().someName);
+    let imagesForDeleting = parametar.doc.data().someName;
+    imagesForDeleting.forEach((el) => {
+      const desertRef = sRef(storage, `images/${el}`);
+      deleteObject(desertRef)
+        .then(() => {
+          console.log("deleted");
+          // File deleted successfully
+        })
+        .catch((error) => {
+          // Uh-oh, an error occurred!
+        });
+    });
     document.getElementById(`${theUid}`).remove();
     deleteDoc(doc(db, "watches", `${theUid}`));
   });
@@ -266,7 +304,8 @@ let creatingWatch = (parametar) => {
     theLink,
     uploadDate,
     theBrake,
-    uploadTime
+    uploadTime,
+    viewsOfThePost
   );
   thedescriptionOfWatch.append(
     thenameOfWatch,
@@ -291,7 +330,7 @@ let creatingWatch = (parametar) => {
   });
   theimgOfWatch.src = srcOfImg;
   thenameOfWatch.innerHTML = modelOfWatch;
-
+  thenameOfWatch.style.textTransform = "capitalize";
   theCard.addEventListener("mouseover", () => {
     deleteBtn.style.display = "block";
   });
@@ -311,11 +350,19 @@ let creatingWatch = (parametar) => {
 
 const imgOfWatch = document.getElementById("img-of-watch");
 let filesSecond = [];
+let namingOfImagesSecond = [];
 let reader = new FileReader();
 imgOfWatch.onchange = (e) => {
   filesSecond = e.target.files;
   // let extention = GetFileExt(files[0]);
   // let theName = GetFileName(files[0]);
+  let namesOfImagesSecond = Object.values(filesSecond);
+  console.log(namesOfImagesSecond);
+  namesOfImagesSecond.forEach((el) => {
+    namingOfImagesSecond.push(el.name);
+  });
+  console.log(namesOfImagesSecond);
+
   reader.readAsDataURL(filesSecond[0]);
 };
 
@@ -334,7 +381,8 @@ addingWatches.addEventListener("click", () => {
     watchProdYear,
     descOfWatch,
     watchPrize,
-    filesSecond
+    filesSecond,
+    namingOfImagesSecond
   );
 });
 // let allUrls = [];
@@ -430,8 +478,6 @@ const makingTheListing = onSnapshot(collectionQuery, (snapshot) => {
 
     theModalInner.style.display = "block";
 
-     
-
     // closingModal.addEventListener("click", () => {
     //   theModalInner.style.display = "none";
     // });
@@ -465,10 +511,14 @@ const makingTheListing = onSnapshot(collectionQuery, (snapshot) => {
         where("userId", "==", `${auth.currentUser.uid}`)
       );
       const querySnapshot = await getDocs(q);
+
+      // const userAddWatchBtn = document.querySelector("#user-add-watch");
+      // querySnapshot.empty
+      //   ? (userAddWatchBtn.style.display = "none") && creatingModal()
+      //   : null;
       if (querySnapshot.empty) {
         creatingModal();
         const userAddWatchBtn = document.querySelector("#user-add-watch");
-
         userAddWatchBtn.style.display = "none";
       }
     }
@@ -498,11 +548,16 @@ onAuthStateChanged(auth, async (user) => {
       where("userId", "==", `${user.uid}`)
     );
     const querySnapshot = await getDocs(q);
+    // querySnapshot.empty
+    //   ? (document.querySelector("#user-add-watch").style.display = "none") &&
+    //     creatingModal()
+    //   : (document.querySelector("#user-add-watch").style.display = "block");
     if (querySnapshot.empty) {
       creatingModal();
       document.querySelector("#user-add-watch").style.display = "none";
-
       // document.querySelector("#user-add-watch").parentElement.remove();
+    } else {
+      document.querySelector("#user-add-watch").style.display = "block";
     }
   } else {
     signUp.textContent = "Sign Up";

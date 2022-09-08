@@ -7,6 +7,8 @@ import {
 import {
   doc,
   getDoc,
+  updateDoc,
+  setDoc,
 } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js";
 import {
   signOut,
@@ -24,7 +26,7 @@ let databaseNeededId =
   docSnap._document.data.value.mapValue.fields.userId.stringValue;
 const databaseRef = ref(database, `users/${databaseNeededId}`);
 get(databaseRef)
-  .then((snapshot) => {
+  .then(async (snapshot) => {
     if (snapshot.exists()) {
       console.log(snapshot.val().displayName);
       const contactNum = document.getElementById("contact-num");
@@ -43,6 +45,19 @@ get(databaseRef)
     console.error(error);
   });
 if (docSnap.exists()) {
+  let number = 0;
+  let views = {
+    howManyViews: number++,
+  };
+  let theViews = docSnap.data().howManyViews;
+  console.log(theViews);
+  await updateDoc(docRef, {
+    howManyViews: ++theViews,
+  });
+
+  // updateDoc(docSnap, views)
+  //   .then((docSnap) => {})
+  //   .catch((docSnap) => {});
   console.log(docSnap._document.data.value.mapValue.fields.userId.stringValue);
   console.log(docSnap);
   const theDocumentSnap = docSnap.data();

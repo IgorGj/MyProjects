@@ -46,11 +46,35 @@
         </ul>
       </div>
     </nav>
+    <form class="form-inline justify-content-center mt-5">
+      <div class="form-group mb-2">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Пребарувај по марка"
+          id="search-by-make"
+        />
+      </div>
+      <div class="form-group mx-sm-3 mb-2">
+        <select id="search-by-price" class="form-control">
+          <option value="nothing" selected>Одбери Филтер</option>
+          <option value="Newest">Најновите први</option>
+          <option value="Cheepest">Наејфтините први</option>
+          <option value="Most expensive">Најскапите први</option>
+          <option value="Most viewed">Најпосетени први</option>
+        </select>
+      </div>
+      <button class="btn btn-primary mb-2" id="search-btn">Пребарај</button>
+    </form>
+    <form id="search-info" class="form-inline justify-content-center">
+      <div class="form-group mb-2">
+        <p class="text-danger">Внеси го целото име на часовникот</p>
+      </div>
+    </form>
 
     <div class="container pt-5" id="the-container">
       <div class="row row-cols-lg-4" id="important-row"></div>
     </div>
-
 
     <!-- ON THE BOTTOM INSIDE THE BODY TAG -->
     <!-- JQUERY CDN -->
