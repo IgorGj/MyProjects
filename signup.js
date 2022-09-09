@@ -22,7 +22,8 @@ const facebookBtn = document.getElementById("facebook");
 const createWatchMkAcc = document.getElementById("watch-mk-acc");
 const signInCard = document.getElementById("sign-in-card");
 
-let onlyOnce = true;
+let onlyOnceGoogle = true;
+let onlyOnceFacebook = true;
 
 let widthChange = 1;
 const theInterval = () => {
@@ -38,12 +39,17 @@ googleBtn.addEventListener("click", () => {
   if (formDiv) {
     formDiv.style.display = "none";
   }
-
+  const fbFormWrapper = document.getElementById("fb-name-contact-wrapper");
+  if (fbFormWrapper) {
+    fbFormWrapper.style.display = "none";
+  }
   const h5 = document.querySelector("#hfive-for-acc");
   h5.style.display = "none";
   const watchSaleSiteAccBtn = document.querySelector("#watch-mk-acc");
   watchSaleSiteAccBtn.style.display = "none";
 
+  const nameAndContactWrapper = document.createElement("div");
+  nameAndContactWrapper.setAttribute("id", "name-contact-wrapper");
   const fullNameInput = document.createElement("input");
   const contactInfoInput = document.createElement("input");
   const signupWithGoogle = document.createElement("button");
@@ -67,10 +73,15 @@ googleBtn.addEventListener("click", () => {
   signupWithGoogle.textContent = "Sign Up With Google";
   signupWithGoogle.classList.add("btn", "btn-info");
 
-  if (onlyOnce) {
-    signInCard.append(fullNameInput, contactInfoInput, signupWithGoogle);
+  if (onlyOnceGoogle) {
+    nameAndContactWrapper.append(
+      fullNameInput,
+      contactInfoInput,
+      signupWithGoogle
+    );
+    signInCard.append(nameAndContactWrapper);
   }
-  onlyOnce = false;
+  onlyOnceGoogle = false;
 
   signupWithGoogle.addEventListener("click", (e) => {
     if (contactInfoInput.value === "" || fullNameInput.value === "") {
@@ -154,7 +165,13 @@ googleBtn.addEventListener("click", () => {
 });
 facebookBtn.addEventListener("click", () => {
   // theLoadingScreen();
+  const nameContactWrapper = document.getElementById("name-contact-wrapper");
+  if (nameContactWrapper) {
+    nameContactWrapper.style.display = "none";
+  }
 
+  const fbNameContactWrapper = document.createElement("div");
+  fbNameContactWrapper.setAttribute("id", "fb-name-contact-wrapper");
   const fullNameInput = document.createElement("input");
   const contactInfoInput = document.createElement("input");
   const signUpWithFaceBookBtn = document.createElement("button");
@@ -183,7 +200,15 @@ facebookBtn.addEventListener("click", () => {
   h5.style.display = "none";
   const watchSaleSiteAccBtn = document.querySelector("#watch-mk-acc");
   watchSaleSiteAccBtn.style.display = "none";
-
+  if (onlyOnceFacebook) {
+    fbNameContactWrapper.append(
+      fullNameInput,
+      contactInfoInput,
+      signUpWithFaceBookBtn
+    );
+    signInCard.append(fbNameContactWrapper);
+  }
+  onlyOnceFacebook = false;
   signUpWithFaceBookBtn.addEventListener("click", (e) => {
     document.getElementById("loader").style.display = "block";
     setInterval(theInterval, 30.333333);
@@ -224,7 +249,6 @@ facebookBtn.addEventListener("click", () => {
       });
   });
 
-  signInCard.append(fullNameInput, contactInfoInput, signUpWithFaceBookBtn);
   // signInWithPopup(auth, facebookProvider)
   //   .then((result) => {
   //     // The signed-in user info.
