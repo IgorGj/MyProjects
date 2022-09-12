@@ -106,6 +106,12 @@ loginBtn.addEventListener("click", () => {
       console.log(userCredential.user);
     })
     .catch((error) => {
+      const container = document.querySelector(".container.text-center");
+      console.log(container);
+      // container.innerHTML = "<h2>This Account Does not Exist</h2>";
+
+      document.querySelector("#myModal").style.display = "block";
+      console.log("ne postoj userot");
       const errorCode = error.code;
       const errorMessage = error.message;
     });
