@@ -1,0 +1,187 @@
+.menu {
+  border-bottom: 1px solid lightgrey;
+  padding: 15px 0;
+}
+
+.navbar-nav>li>a {
+  color: black;
+  text-transform: uppercase;
+  padding: 0;
+  margin: 15px 10PX;
+}
+
+.nav>li>a:focus,
+.nav>li>a:hover {
+  background-color: transparent;
+  color: #f95e6d;
+}
+
+.Banner {
+  background-image: url("//cdn.shopify.com/s/files/1/1824/4681/t/3/assets/breadcrumb_image_2.jpg?0");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.Banner h1 {
+  margin: 0;
+  font-weight: 700;
+  padding: 0 15px;
+  color: #fff;
+  margin: 0;
+  text-transform: capitalize;
+  text-align: center;
+  font-size: 60px;
+}
+
+.Card {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.Card img {
+  width: 100%;
+  display: block;
+}
+
+.Card h2 {
+  font-size: 14px;
+  color: black;
+}
+
+.Card a {
+  border: 1px solid lightgrey;
+  display: block;
+  transition: all .2s ease-in-out;
+  padding-bottom: 20px;
+}
+
+.Card a:hover {
+  text-decoration: none;
+  box-shadow: 0 10px 10px lightgrey;
+}
+
+.Card .price {
+  font-weight: bold;
+  color: #f95e6d;
+  font-size: 15px;
+}
+
+.fa {
+  color: #f95e6d;
+}
+
+
+.CardCont {
+  padding: 40px 0;
+}
+
+.CardCont .title {
+  font-weight: bold;
+  font-size: 30px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 40px;
+  margin-top: 0;
+}
+
+.Footer h2 {
+  color: lightgrey;
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 0;
+}
+
+.Footer .lists {
+  padding: 50px 0;
+  border-top: 1px solid lightgrey;
+}
+
+.Footer ul {
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style-type: none;
+  line-height: 30px;
+}
+
+.Footer ul li a {
+  color: black;
+  text-transform: uppercase;
+  transition: color .2s ease-in-out;
+}
+
+.Footer ul li a:hover {
+  color: #f95e6d;
+  text-decoration: none;
+}
+
+.Footer .copyright {
+  border-top: 1px solid lightgrey;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 30px 0;
+}
+
+.Footer .copyright span {
+  font-weight: bold;
+}
+
+.CardDetail .info-cont {
+  margin-top: 40px;
+}
+
+.CardDetail .price {
+  font-weight: bold;
+  font-size: 48px;
+  color: #f95e6d;
+}
+
+.CardDetail .title {
+  font-weight: bold;
+  font-size: 30px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.CardDetail p {
+  margin-top: 20px;
+}
+
+.CardDetail .button {
+  line-height: 40px;
+  padding: 0 50px;
+  margin-top: 20px;
+  color: #fff;
+  background-color: #f95e6d;
+  border: 1px solid #f95e6d;
+  transition: all .3s ease-out;
+}
+
+.CardDetail .button:hover {
+  background-color: white;
+  color: #f95e6d;
+}
+
+.ErrorPage {
+  padding: 100px 0;
+  text-align: center;
+}
+
+.ErrorPage h1 {
+  font-size: 70px;
+  color: #f95e6d;
+}
+
+.ErrorPage p {
+  font-size: 20px;
+}
+
+.ErrorPage .link {
+  color: #f95e6d;
+}
