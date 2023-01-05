@@ -1,0 +1,58 @@
+.logo-container {
+  svg {
+    width: 50%;
+    height: auto;
+    bottom: 0;
+    transform: rotateZ(30deg) !important;
+  }
+
+  .solid-logo {
+    position: absolute;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    margin: auto;
+    width: 100%;
+    opacity: 0;
+    transform: rotateZ(30deg) !important;
+    z-index: 1;
+  }
+}
+
+.svg-container {
+  stroke: #ffd700;
+  stroke-width: 10;
+}
+
+.animatedDivFromLeft {
+  // opacity: 0;
+  // margin-left: -2000px;
+  animation: fadeInFromLeft 2s normal ease-in-out;
+}
+// .animatedDivFromRight {
+//   // opacity: 0;
+//   // margin-left: -2000px;
+//   animation: fadeInFromRight 2s normal ease-in-out;
+// }
+
+@keyframes fadeInFromLeft {
+  0% {
+    opacity: 0;
+    margin-left: -2000px;
+  }
+  100% {
+    opacity: 1;
+    margin-left: 0;
+  }
+}
+// @keyframes fadeInFromRight {
+//   0% {
+//     opacity: 0;
+//     margin-right: -2000px;
+//   }
+//   100% {
+//     opacity: 1;
+//     margin-left: 0;
+//   }
+// }

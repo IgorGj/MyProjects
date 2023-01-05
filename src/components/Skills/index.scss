@@ -1,0 +1,107 @@
+h1 {
+  font-size: 53px;
+  font-family: "Coolvetica";
+  // color: rgb(240, 144, 83);
+  font-weight: 400;
+  margin-top: 0;
+  position: relative;
+  margin-bottom: 40px;
+  left: -10px;
+
+  &:before {
+    content: "<h1>";
+    font-family: "La Belle Aurore", cursive;
+    color: rgb(240, 144, 83);
+    font-size: 18px;
+    position: absolute;
+    margin-top: -10px;
+    left: 0px;
+    opacity: 0.6;
+    line-height: 18px;
+  }
+
+  &:after {
+    content: "<h1/>";
+    font-family: "La Belle Aurore", cursive;
+    color: rgb(240, 144, 83);
+    font-size: 18px;
+    line-height: 18px;
+    position: absolute;
+    left: -15px;
+    bottom: -20px;
+    margin-left: 20px;
+    opacity: 0.6;
+  }
+}
+p {
+  font-size: 18px;
+
+  // color: rgb(240, 144, 83);
+  font-weight: 400;
+  margin-top: 0;
+  position: relative;
+  margin-bottom: 40px;
+  left: -10px;
+
+  &:before {
+    content: "<p>";
+    font-family: "La Belle Aurore", cursive;
+    color: rgb(240, 144, 83);
+    font-size: 18px;
+    position: absolute;
+    margin-top: -15px;
+    left: 0px;
+    opacity: 0.6;
+    line-height: 18px;
+  }
+
+  &:after {
+    content: "<p/>";
+    font-family: "La Belle Aurore", cursive;
+    color: rgb(240, 144, 83);
+    font-size: 18px;
+    line-height: 18px;
+    position: absolute;
+    left: -14px;
+    bottom: -25px;
+    margin-left: 20px;
+    opacity: 0.6;
+  }
+}
+.divTag {
+  &:before {
+    content: "<div>";
+    font-family: "La Belle Aurore", cursive;
+    color: rgb(240, 144, 83);
+    font-size: 18px;
+    position: absolute;
+    margin-top: -50px;
+    left: -2px;
+    opacity: 0.6;
+    line-height: 18px;
+  }
+
+  &:after {
+    content: "<div/>";
+    font-family: "La Belle Aurore", cursive;
+    color: rgb(240, 144, 83);
+    font-size: 18px;
+    line-height: 18px;
+    position: absolute;
+    left: -20px;
+    bottom: -30px;
+    margin-left: 20px;
+    opacity: 0.6;
+
+  }
+}
+
+.popup {
+  position: absolute;
+  display: block;
+  bottom: 20px;
+  right: 50px;
+  background-color: black;
+  padding: 10px 30px;
+  border-radius: 30px;
+}

@@ -1,0 +1,29 @@
+@import "animate.css";
+.text-animate {
+
+  opacity: 0;
+  // animation: bounceIn;
+  animation-duration: 1s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+  min-width: 10px;
+  margin-bottom: 8px;
+}
+
+.img-hover {
+  min-width: 10px;
+  display: inline-block;
+  animation-fill-mode: both;
+  margin-bottom: 8px;
+  cursor: context-menu;
+  &:hover {
+    animation: rubberBand 1s;
+    color: #f09053;
+  }
+}
+
+@for $i from 1 through 150 {
+  .text-animate._#{$i} {
+    animation-delay: #{$i / 15}s;
+  }
+}
